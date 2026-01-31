@@ -55,7 +55,7 @@ export const adminOptions = {
   ],
   branding: {
     companyName: 'SeweetyBella Admin',
-    logo: false,
+    logo: '/logo.png',
     withMadeWithLove: false,
     softwareBrothers: false,
   },
