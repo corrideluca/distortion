@@ -6,7 +6,7 @@
     "dev": "next dev",
     "dev:admin": "tsx app/api/admin-server.mts",
     "dev:all": "concurrently \"npm run dev\" \"npm run dev:admin\"",
-    "build": "next build",
+    "build": "next build --webpack",
     "start": "next start",
     "start:admin": "tsx admin-server.mts",
     "lint": "eslint",
