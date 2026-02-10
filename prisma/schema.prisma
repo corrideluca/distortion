@@ -31,3 +31,10 @@ model Admin {
 
   @@map("admins")
 }
+
+model Setting {
+  key   String @id
+  value String
+
+  @@map("settings")
+}

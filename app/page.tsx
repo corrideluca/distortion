@@ -1,10 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, Suspense } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Navbar from "@/components/Navbar";
 import ProductCard from "@/components/ProductCard";
+import AdminOverlay, { AddProductCard, AddProductModal } from "@/components/AdminOverlay";
+import { getSetting, updateSetting } from "@/app/actions";
+
+const DEFAULT_HERO_IMAGE =
+  "https://images.unsplash.com/photo-1509440159596-0249088772ff?q=80&w=2072&auto=format&fit=crop";
 
 interface Product {
   id: string;
@@ -14,28 +19,67 @@ interface Product {
   image: string;
 }
 
-export default function Home() {
+function HomeContent() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [adminAuthed, setAdminAuthed] = useState(false);
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+
+  // Hero settings
+  const [heroImage, setHeroImage] = useState(DEFAULT_HERO_IMAGE);
+  const [logoUrl, setLogoUrl] = useState("/logo.png");
+  const [showHeroEdit, setShowHeroEdit] = useState(false);
+  const [heroImageInput, setHeroImageInput] = useState("");
+  const [logoInput, setLogoInput] = useState("");
+  const [savingHero, setSavingHero] = useState(false);
+
+  const fetchProducts = useCallback(async () => {
+    try {
+      const response = await fetch("/api/products");
+      const data = await response.json();
+      setProducts(data);
+    } catch (error) {
+      console.error("Error fetching products:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const fetchSettings = useCallback(async () => {
+    const [heroImg, logo] = await Promise.all([
+      getSetting("hero_image"),
+      getSetting("hero_logo"),
+    ]);
+    if (heroImg) setHeroImage(heroImg);
+    if (logo) setLogoUrl(logo);
+  }, []);
 
   useEffect(() => {
-    async function fetchProducts() {
-      try {
-        const response = await fetch("/api/products");
-        const data = await response.json();
-        setProducts(data);
-      } catch (error) {
-        console.error("Error fetching products:", error);
-      } finally {
-        setLoading(false);
-      }
-    }
-
     fetchProducts();
-  }, []);
+    fetchSettings();
+  }, [fetchProducts, fetchSettings]);
+
+  const handleSaveHero = async () => {
+    setSavingHero(true);
+    if (heroImageInput.trim()) {
+      await updateSetting("hero_image", heroImageInput.trim());
+      setHeroImage(heroImageInput.trim());
+    }
+    if (logoInput.trim()) {
+      await updateSetting("hero_logo", logoInput.trim());
+      setLogoUrl(logoInput.trim());
+    }
+    setSavingHero(false);
+    setShowHeroEdit(false);
+  };
 
   return (
     <div className="min-h-screen bg-[#EDF4ED]">
+      <AdminOverlay
+        onRefresh={fetchProducts}
+        onAuthChange={setAdminAuthed}
+      />
       <Navbar />
 
       {/* Hero Banner Section */}
@@ -43,7 +87,7 @@ export default function Home() {
         {/* Hero Image */}
         <div className="absolute inset-0">
           <Image
-            src="https://images.unsplash.com/photo-1509440159596-0249088772ff?q=80&w=2072&auto=format&fit=crop"
+            src={heroImage}
             alt="SeweetyBella"
             fill
             priority
@@ -56,6 +100,82 @@ export default function Home() {
           <div className="absolute inset-0 bg-gradient-to-b from-[#301014]/70 via-[#301014]/50 to-[#301014]/80"></div>
         </div>
 
+        {/* Admin edit banner button */}
+        {adminAuthed && (
+          <button
+            onClick={() => {
+              setHeroImageInput(heroImage === DEFAULT_HERO_IMAGE ? "" : heroImage);
+              setLogoInput(logoUrl === "/logo.png" ? "" : logoUrl);
+              setShowHeroEdit(true);
+            }}
+            className="absolute left-4 top-1/2 -translate-y-1/2 z-20 bg-[#301014]/80 hover:bg-[#301014] text-[#F0D7A7] px-3 py-2 rounded-lg text-sm font-medium cursor-pointer transition-colors flex items-center gap-2"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
+            Editar Banner
+          </button>
+        )}
+
+        {/* Hero edit modal */}
+        {showHeroEdit && (
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-bold text-[#301014]">Editar Banner</h2>
+                <button
+                  onClick={() => setShowHeroEdit(false)}
+                  className="text-[#51291E]/50 hover:text-[#301014] text-2xl leading-none cursor-pointer"
+                >
+                  &times;
+                </button>
+              </div>
+
+              <label className="block text-sm font-medium text-[#51291E] mb-1">
+                URL de Imagen de Fondo
+              </label>
+              <input
+                type="url"
+                value={heroImageInput}
+                onChange={(e) => setHeroImageInput(e.target.value)}
+                placeholder={DEFAULT_HERO_IMAGE}
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl mb-4 text-[#301014] focus:outline-none focus:ring-2 focus:ring-[#F0D7A7] focus:border-transparent text-sm"
+              />
+
+              <label className="block text-sm font-medium text-[#51291E] mb-1">
+                URL del Logo
+              </label>
+              <input
+                type="url"
+                value={logoInput}
+                onChange={(e) => setLogoInput(e.target.value)}
+                placeholder="/logo.png"
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl mb-4 text-[#301014] focus:outline-none focus:ring-2 focus:ring-[#F0D7A7] focus:border-transparent text-sm"
+              />
+
+              <p className="text-xs text-[#51291E]/50 mb-4">
+                Dejá vacío para usar los valores por defecto.
+              </p>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowHeroEdit(false)}
+                  className="flex-1 py-3 border border-gray-200 text-[#51291E] font-semibold rounded-xl hover:bg-gray-50 transition-colors cursor-pointer"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleSaveHero}
+                  disabled={savingHero}
+                  className="flex-1 py-3 bg-[#301014] text-[#F0D7A7] font-bold rounded-xl hover:bg-[#51291E] transition-colors disabled:opacity-50 cursor-pointer"
+                >
+                  {savingHero ? "Guardando..." : "Guardar"}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Hero Content */}
         <div className="relative h-full flex items-center justify-center">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -65,7 +185,7 @@ export default function Home() {
               transition={{ duration: 0.8, delay: 0.4 }}
             >
               <Image
-                src="/logo.png"
+                src={logoUrl}
                 width={200}
                 height={100}
                 alt="SeweetyBella"
@@ -151,11 +271,44 @@ export default function Home() {
               </p>
             </motion.div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-              {products.map((product, index) => (
-                <ProductCard key={product.id} {...product} index={index} />
-              ))}
-            </div>
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                {products.map((product, index) => (
+                  <ProductCard
+                    key={product.id}
+                    {...product}
+                    index={index}
+                    adminMode={adminAuthed}
+                    onDeleted={fetchProducts}
+                    onEdit={() => setEditingProduct(product)}
+                  />
+                ))}
+                {adminAuthed && (
+                  <AddProductCard onClick={() => setShowAddForm(true)} />
+                )}
+              </div>
+              {/* Add product modal */}
+              {showAddForm && (
+                <AddProductModal
+                  onClose={() => setShowAddForm(false)}
+                  onCreated={() => {
+                    setShowAddForm(false);
+                    fetchProducts();
+                  }}
+                />
+              )}
+              {/* Edit product modal */}
+              {editingProduct && (
+                <AddProductModal
+                  product={editingProduct}
+                  onClose={() => setEditingProduct(null)}
+                  onCreated={() => {
+                    setEditingProduct(null);
+                    fetchProducts();
+                  }}
+                />
+              )}
+            </>
           )}
         </div>
       </section>
@@ -478,5 +631,13 @@ export default function Home() {
         </div>
       </footer>
     </div>
+  );
+}
+
+export default function Home() {
+  return (
+    <Suspense>
+      <HomeContent />
+    </Suspense>
   );
 }

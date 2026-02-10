@@ -1,7 +1,9 @@
 'use client';
 
+import { useState } from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
+import { deleteProduct } from '@/app/actions';
 
 interface ProductCardProps {
   id: string;
@@ -10,15 +12,23 @@ interface ProductCardProps {
   price: number;
   image: string;
   index: number;
+  adminMode?: boolean;
+  onDeleted?: () => void;
+  onEdit?: () => void;
 }
 
 export default function ProductCard({
+  id,
   name,
   description,
   price,
   image,
   index,
+  adminMode,
+  onDeleted,
+  onEdit,
 }: ProductCardProps) {
+  const [deleting, setDeleting] = useState(false);
   const handleBuyClick = () => {
     const phoneNumber = '5491168801698';
     const message = `Hola! Me gustaría pedir el producto: ${name} ($${price})`;
@@ -34,6 +44,32 @@ export default function ProductCard({
       transition={{ duration: 0.5, delay: index * 0.1 }}
       className="group relative overflow-hidden rounded-2xl bg-white shadow-lg hover:shadow-2xl transition-all duration-300 border-2 border-[#F0D7A7]/20 hover:border-[#F0D7A7]/50"
     >
+      {adminMode && (
+        <div className="absolute top-3 right-3 z-10 flex gap-2">
+          <button
+            onClick={() => onEdit?.()}
+            className="bg-[#301014] hover:bg-[#51291E] text-[#F0D7A7] w-8 h-8 rounded-full flex items-center justify-center shadow-lg transition-colors cursor-pointer"
+            title="Editar producto"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
+          </button>
+          <button
+            onClick={async () => {
+              if (!confirm(`¿Eliminar "${name}"?`)) return;
+              setDeleting(true);
+              await deleteProduct(id);
+              onDeleted?.();
+            }}
+            disabled={deleting}
+            className="bg-red-500 hover:bg-red-600 text-white w-8 h-8 rounded-full flex items-center justify-center shadow-lg transition-colors disabled:opacity-50 cursor-pointer"
+            title="Eliminar producto"
+          >
+            &times;
+          </button>
+        </div>
+      )}
       <div className="relative h-48 sm:h-64 w-full overflow-hidden bg-[#EDF4ED]">
         <Image
           src={image}
