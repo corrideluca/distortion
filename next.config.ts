@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  turbopack: {},
   images: {
     remotePatterns: [
       {
@@ -22,17 +23,26 @@ const nextConfig: NextConfig = {
   },
   webpack: (config, { isServer }) => {
     if (isServer) {
-      // Externalize AdminJS and its dependencies to avoid bundling issues
+      // Configure externals to use commonjs format (for require)
       const externals = config.externals || [];
+
+      // Only externalize build-time dependencies that shouldn't be bundled
       config.externals = [
         ...externals,
-        'adminjs',
-        '@adminjs/express',
-        '@adminjs/prisma',
-        '@adminjs/upload',
-        'rollup',
-        'esbuild',
-        'fsevents',
+        ({request}: {request?: string}, callback: (error?: Error | null, result?: string) => void) => {
+          // Externalize build-time dependencies
+          if (
+            request === 'fsevents' ||
+            request === 'rollup' ||
+            request === 'esbuild' ||
+            request?.startsWith('@esbuild/') ||
+            request === 'rollup-plugin-esbuild-minify' ||
+            request === 'chokidar'
+          ) {
+            return callback(null, `commonjs ${request}`);
+          }
+          callback();
+        },
       ];
 
       // Suppress warnings about dynamic requires in AdminJS
