@@ -21,8 +21,8 @@ const testimonials = [
     quote: "Amé la pastafrola!! muy rica, super recomiendo",
     name: "Corrado De Luca",
   },
-  { quote: "Las trufas son lo mas!", name: "Dani Imbrogno" },
-  { quote: "Muy ricos los alfajorcitoos.", name: "Chiara Adamo" },
+  { quote: "Las trufas son lo más!", name: "Daniela Imbrogno" },
+  { quote: "Muy ricos los alfajorcitoos.", name: "Chiara Adamo Sangiuliano" },
 ];
 
 function TestimonialsCarousel() {
