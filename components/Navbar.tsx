@@ -50,7 +50,7 @@ export default function Navbar() {
                 src="/logo.png"
                 width={200}
                 height={100}
-                alt="SeweetyBella"
+                alt="SweetyBella"
                 className="object-contain"
               />
             </Link>

@@ -101,7 +101,7 @@ export default function Footer() {
               allowFullScreen
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
-              title="SeweetyBella Location"
+              title="SweetyBella Location"
             ></iframe>
           </div>
         </div>
@@ -109,7 +109,7 @@ export default function Footer() {
         {/* Copyright */}
         <div className="text-center pt-8 border-t border-[#F0D7A7]/20">
           <p className="text-[#F0D7A7]/70 text-sm">
-            © 2024 SeweetyBella. Todos los derechos reservados.
+            © 2024 SweetyBella. Todos los derechos reservados.
           </p>
         </div>
       </div>

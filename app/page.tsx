@@ -204,7 +204,7 @@ function HomeContent() {
         <div className="absolute inset-0">
           <Image
             src={heroImage}
-            alt="SeweetyBella"
+            alt="SweetyBella"
             fill
             priority
             className="object-cover"
@@ -316,7 +316,7 @@ function HomeContent() {
                 src={logoUrl}
                 width={200}
                 height={100}
-                alt="SeweetyBella"
+                alt="SweetyBella"
                 className="object-contain min-w-[25rem] mx-auto"
               />
               <motion.p

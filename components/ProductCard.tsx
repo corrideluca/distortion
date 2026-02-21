@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { deleteProduct } from '@/app/actions';
+import { useIsMobile } from '@/hooks/useIsMobile';
 
 interface ProductCardProps {
   id: string;
@@ -29,6 +30,7 @@ export default function ProductCard({
   onEdit,
 }: ProductCardProps) {
   const [deleting, setDeleting] = useState(false);
+  const isMobile = useIsMobile();
   const handleBuyClick = () => {
     const phoneNumber = '5491168801698';
     const message = `Hola! Me gustaría pedir el producto: ${name} ($${price})`;
@@ -38,7 +40,7 @@ export default function ProductCard({
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 30 }}
+      initial={{ opacity: 0, y: isMobile ? 0 : 30 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '50px' }}
       transition={{ duration: 0.4, delay: index * 0.08 }}

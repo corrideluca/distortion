@@ -11,9 +11,9 @@ export default function QuienesSomos() {
       <Navbar />
 
       {/* Hero */}
-      <section className="bg-[#301014] min-h-screen relative overflow-hidden pt-32">
-        {/* Sofia's photo — right side */}
-        <div className="absolute right-0 top-0 bottom-0 w-1/2 sm:w-2/5">
+      <section className="bg-[#301014] sm:min-h-screen relative overflow-hidden pt-24 sm:pt-32">
+        {/* Sofia's photo — stacked on mobile, absolute on desktop */}
+        <div className="relative w-full h-[28rem] sm:absolute sm:right-0 sm:top-0 sm:bottom-0 sm:w-2/5 sm:h-auto">
           <Image
             src="/sofia.jpeg"
             fill
@@ -21,14 +21,14 @@ export default function QuienesSomos() {
             className="object-cover object-top"
             priority
           />
-          {/* Fade into background from left */}
-          <div className="absolute inset-0 bg-gradient-to-r from-[#301014] via-[#301014]/40 to-transparent" />
+          {/* Fade into background from left — desktop only */}
+          <div className="hidden sm:block absolute inset-0 bg-gradient-to-r from-[#301014] via-[#301014]/40 to-transparent" />
           {/* Fade from bottom */}
-          <div className="absolute inset-0 bg-gradient-to-t from-[#301014]/60 via-transparent to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#301014] via-[#301014]/40 to-transparent" />
         </div>
 
         {/* Text content */}
-        <div className="relative flex items-end min-h-screen pb-16 sm:pb-24 px-6 sm:px-12 lg:px-20">
+        <div className="relative sm:flex sm:items-end sm:min-h-screen pb-16 sm:pb-24 px-6 sm:px-12 lg:px-20 pt-6 sm:pt-0">
           <div className="w-full max-w-6xl">
             <motion.p
               initial={{ opacity: 0, y: 10 }}
