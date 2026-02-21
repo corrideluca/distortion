@@ -58,10 +58,10 @@ export default function Footer() {
                 </a>
               </div>
 
-              {/* Address */}
-              <div className="flex items-start gap-3">
+              {/* Location */}
+              <div className="flex items-center gap-3">
                 <svg
-                  className="w-5 h-5 sm:w-6 sm:h-6 text-[#F0D7A7] mt-1 flex-shrink-0"
+                  className="w-5 h-5 sm:w-6 sm:h-6 text-[#F0D7A7] flex-shrink-0"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -81,29 +81,26 @@ export default function Footer() {
                   />
                 </svg>
                 <span className="text-[#F0D7A7] text-sm sm:text-base">
-                  Comodoro Rivadavia 510
-                  <br />
-                  B1617FLD Gral. Pacheco
-                  <br />
-                  Provincia de Buenos Aires
+                  CP B1617 — Gral. Pacheco, Buenos Aires
                 </span>
               </div>
             </div>
           </div>
 
-          {/* Google Maps */}
+          {/* Google Maps — area view, no specific address pin */}
           <div className="h-[250px] sm:h-[300px] rounded-xl overflow-hidden shadow-lg">
             <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3290.5956788716574!2d-58.63682812345841!3d-34.45926265277037!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x95bca482424b4dd9%3A0x5e7596e48e0fc867!2sComodoro%20Rivadavia%20510%2C%20B1617FLD%20Gral.%20Pacheco%2C%20Provincia%20de%20Buenos%20Aires!5e0!3m2!1sen!2sar!4v1706123456789!5m2!1sen!2sar"
+              src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d26322!2d-58.638!3d-34.459!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sen!2sar!4v1706123456789!5m2!1sen!2sar"
               width="100%"
               height="100%"
               style={{ border: 0 }}
               allowFullScreen
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
-              title="SweetyBella Location"
+              title="SweetyBella Zone"
             ></iframe>
           </div>
+
         </div>
 
         {/* Copyright */}
