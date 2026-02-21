@@ -28,7 +28,7 @@ export default function Pedidos() {
       <Navbar />
 
       {/* Hero */}
-      <section className="bg-[#51291E] min-h-screen flex items-end pb-16 sm:pb-24 px-6 sm:px-12 lg:px-20 pt-32">
+      <section className="bg-[#51291E] min-h-[80vh] sm:min-h-screen flex items-end pb-16 sm:pb-24 px-6 sm:px-12 lg:px-20 pt-32">
         <div className="w-full max-w-6xl">
           <motion.p
             initial={{ opacity: 0, y: 10 }}
