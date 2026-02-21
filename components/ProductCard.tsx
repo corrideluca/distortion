@@ -44,7 +44,6 @@ export default function ProductCard({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '50px' }}
       transition={{ duration: 0.4, delay: index * 0.08 }}
-      style={{ willChange: "transform, opacity" }}
       className="group relative overflow-hidden rounded-2xl bg-white shadow-lg hover:shadow-2xl transition-all duration-300 border-2 border-[#F0D7A7]/20 hover:border-[#F0D7A7]/50"
     >
       {adminMode && (
