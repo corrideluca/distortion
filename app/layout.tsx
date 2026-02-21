@@ -13,15 +13,65 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "SeweetyBella - Productos Artesanales",
-  description: "Descubrí nuestros productos artesanales hechos con amor y los mejores ingredientes. Panadería y repostería de calidad.",
-  keywords: ["panadería", "bakery", "productos artesanales", "repostería", "SeweetyBella"],
-  authors: [{ name: "SeweetyBella" }],
+  metadataBase: new URL("https://sweetybella.com"),
+  title: {
+    default: "SweetyBella - Pastelería Artesanal",
+    template: "%s | SweetyBella",
+  },
+  description:
+    "Descubrí nuestros productos artesanales hechos con amor: tortas, alfajores, brownies y más. Pedidos personalizados para cada ocasión en Gral. Pacheco, Buenos Aires.",
+  keywords: [
+    "pastelería artesanal",
+    "repostería",
+    "tortas personalizadas",
+    "alfajores",
+    "brownies",
+    "SweetyBella",
+    "Gral. Pacheco",
+    "Buenos Aires",
+    "pedidos a domicilio",
+    "pastelería casera",
+  ],
+  authors: [{ name: "Sofía", url: "https://sweetybella.com" }],
+  creator: "SweetyBella",
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+    },
+  },
+  alternates: {
+    canonical: "/",
+  },
   openGraph: {
-    title: "SeweetyBella - Productos Artesanales",
-    description: "Productos artesanales hechos con amor y los mejores ingredientes",
-    type: "website",
+    title: "SweetyBella - Pastelería Artesanal",
+    description:
+      "Productos artesanales hechos con amor y los mejores ingredientes. Tortas, alfajores y brownies para cada ocasión.",
+    url: "https://sweetybella.com",
+    siteName: "SweetyBella",
     locale: "es_AR",
+    type: "website",
+    images: [
+      {
+        url: "/logo.png",
+        width: 800,
+        height: 400,
+        alt: "SweetyBella - Pastelería Artesanal",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "SweetyBella - Pastelería Artesanal",
+    description:
+      "Productos artesanales hechos con amor y los mejores ingredientes.",
+    images: ["/logo.png"],
+  },
+  icons: {
+    icon: "/logo.png",
+    apple: "/logo.png",
   },
 };
 

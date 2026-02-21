@@ -38,10 +38,11 @@ export default function ProductCard({
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 50 }}
+      initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-100px' }}
-      transition={{ duration: 0.5, delay: index * 0.1 }}
+      viewport={{ once: true, margin: '50px' }}
+      transition={{ duration: 0.4, delay: index * 0.08 }}
+      style={{ willChange: "transform, opacity" }}
       className="group relative overflow-hidden rounded-2xl bg-white shadow-lg hover:shadow-2xl transition-all duration-300 border-2 border-[#F0D7A7]/20 hover:border-[#F0D7A7]/50"
     >
       {adminMode && (
@@ -70,14 +71,12 @@ export default function ProductCard({
           </button>
         </div>
       )}
-      <div className="relative h-48 sm:h-64 w-full overflow-hidden bg-[#EDF4ED]">
+      <div className="relative h-48 sm:h-64 w-full overflow-hidden bg-gray-100">
         <Image
           src={image}
           alt={name}
           fill
           className="object-cover transition-transform duration-500 group-hover:scale-110"
-          placeholder="blur"
-          blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
           quality={75}
         />
       </div>

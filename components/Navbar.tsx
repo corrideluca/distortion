@@ -2,6 +2,7 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
+import Link from "next/link";
 import { useState, useEffect } from "react";
 
 export default function Navbar() {
@@ -44,7 +45,7 @@ export default function Navbar() {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="flex items-center"
           >
-            <div className="flex items-center gap-2 sm:gap-3 hover:scale-110 transition-all duration-300">
+            <Link href="/" className="flex items-center gap-2 sm:gap-3 hover:scale-110 transition-all duration-300 cursor-pointer">
               <Image
                 src="/logo.png"
                 width={200}
@@ -52,7 +53,7 @@ export default function Navbar() {
                 alt="SeweetyBella"
                 className="object-contain"
               />
-            </div>
+            </Link>
           </motion.div>
 
           {/* Desktop Navigation Links */}
@@ -63,11 +64,25 @@ export default function Navbar() {
             className="hidden md:flex items-center gap-6 lg:gap-8"
           >
             <a
-              href="#products"
+              href="/#products"
               className="text-[#EDF4ED] hover:text-[#F0D7A7] transition-colors duration-300 font-medium text-lg"
             >
               Productos
             </a>
+
+            <Link
+              href="/quienes-somos"
+              className="text-[#EDF4ED] hover:text-[#F0D7A7] transition-colors duration-300 font-medium text-lg"
+            >
+              Quiénes Somos
+            </Link>
+
+            <Link
+              href="/pedidos"
+              className="text-[#EDF4ED] hover:text-[#F0D7A7] transition-colors duration-300 font-medium text-lg"
+            >
+              Pedidos
+            </Link>
 
             <button
               onClick={handleContactClick}
@@ -133,12 +148,28 @@ export default function Navbar() {
           >
             <div className="px-4 py-4 space-y-3">
               <a
-                href="#products"
+                href="/#products"
                 onClick={() => setMobileMenuOpen(false)}
                 className="block text-[#EDF4ED] hover:text-[#F0D7A7] transition-colors duration-300 font-medium text-lg py-2"
               >
                 Productos
               </a>
+
+              <Link
+                href="/quienes-somos"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block text-[#EDF4ED] hover:text-[#F0D7A7] transition-colors duration-300 font-medium text-lg py-2"
+              >
+                Quiénes Somos
+              </Link>
+
+              <Link
+                href="/pedidos"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block text-[#EDF4ED] hover:text-[#F0D7A7] transition-colors duration-300 font-medium text-lg py-2"
+              >
+                Pedidos
+              </Link>
 
               <button
                 onClick={() => {
