@@ -23,6 +23,7 @@ const testimonials = [
   },
   { quote: "Las trufas son lo más!", name: "Daniela Imbrogno" },
   { quote: "Muy ricos los alfajorcitoos.", name: "Chiara Adamo Sangiuliano" },
+  { quote: "Muy rico el Brownie, se nota la calidad", name: "Agustin Casero" },
 ];
 
 function TestimonialsCarousel() {
@@ -199,20 +200,12 @@ function HomeContent() {
       <Navbar />
 
       {/* Hero Banner Section */}
-      <section className="relative overflow-hidden h-[calc(100vh-64px)] sm:h-[90vh] min-h-[500px] sm:min-h-[600px] bg-[#301014]">
-        {/* Hero Image */}
-        <div className="absolute inset-0">
-          <Image
-            src={heroImage}
-            alt="SweetyBella"
-            fill
-            priority
-            className="object-cover"
-            quality={80}
-          />
-          {/* Dark overlay */}
-          <div className="absolute inset-0 bg-gradient-to-b from-[#301014]/70 via-[#301014]/50 to-[#301014]/80"></div>
-        </div>
+      <section
+        className="relative overflow-hidden h-[calc(100vh-64px)] sm:h-[90vh] min-h-[500px] sm:min-h-[600px] bg-fixed bg-cover bg-center"
+        style={{ backgroundImage: `url('${heroImage}')` }}
+      >
+        {/* Dark overlay */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#301014]/70 via-[#301014]/50 to-[#301014]/80" />
 
         {/* Admin edit banner button */}
         {adminAuthed && (

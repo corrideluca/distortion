@@ -30,7 +30,9 @@ export default function ProductCard({
   onEdit,
 }: ProductCardProps) {
   const [deleting, setDeleting] = useState(false);
+  const [hovered, setHovered] = useState(false);
   const isMobile = useIsMobile();
+
   const handleBuyClick = () => {
     const phoneNumber = '5491168801698';
     const message = `Hola! Me gustaría pedir el producto: ${name} ($${price})`;
@@ -40,12 +42,45 @@ export default function ProductCard({
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: isMobile ? 0 : 30 }}
+      initial={{ opacity: 0, y: isMobile ? 0 : 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '50px' }}
-      transition={{ duration: 0.4, delay: index * 0.08 }}
-      className="group relative overflow-hidden rounded-2xl bg-white shadow-lg hover:shadow-2xl transition-all duration-300 border-2 border-[#F0D7A7]/20 hover:border-[#F0D7A7]/50"
+      transition={{ duration: 0.5, delay: index * 0.08 }}
+      className="group relative rounded-xl p-3 overflow-hidden"
+      onMouseEnter={() => !isMobile && setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
     >
+      {/* Static base border — always visible */}
+      <span className="absolute inset-0 rounded-xl border border-gray-200 pointer-events-none" />
+
+      {/* Animated border on desktop — traces over the base on hover */}
+      <span className="hidden md:block pointer-events-none">
+        {/* Top */}
+        <motion.span
+          className="absolute top-0 left-0 h-px bg-[#301014]/30 w-full origin-left"
+          animate={{ scaleX: hovered ? 1 : 0 }}
+          transition={{ duration: 0.25, ease: 'easeInOut', delay: hovered ? 0 : 0 }}
+        />
+        {/* Right */}
+        <motion.span
+          className="absolute top-0 right-0 w-px bg-[#301014]/30 h-full origin-top"
+          animate={{ scaleY: hovered ? 1 : 0 }}
+          transition={{ duration: 0.25, ease: 'easeInOut', delay: hovered ? 0.2 : 0 }}
+        />
+        {/* Bottom */}
+        <motion.span
+          className="absolute bottom-0 right-0 h-px bg-[#301014]/30 w-full origin-right"
+          animate={{ scaleX: hovered ? 1 : 0 }}
+          transition={{ duration: 0.25, ease: 'easeInOut', delay: hovered ? 0.4 : 0 }}
+        />
+        {/* Left */}
+        <motion.span
+          className="absolute bottom-0 left-0 w-px bg-[#301014]/30 h-full origin-bottom"
+          animate={{ scaleY: hovered ? 1 : 0 }}
+          transition={{ duration: 0.25, ease: 'easeInOut', delay: hovered ? 0.6 : 0 }}
+        />
+      </span>
+
       {adminMode && (
         <div className="absolute top-3 right-3 z-10 flex gap-2">
           <button
@@ -72,28 +107,34 @@ export default function ProductCard({
           </button>
         </div>
       )}
-      <div className="relative h-48 sm:h-64 w-full overflow-hidden bg-gray-100">
+
+      {/* Image */}
+      <div className="relative aspect-[4/3] overflow-hidden rounded-lg bg-[#F5EFE6]">
         <Image
           src={image}
           alt={name}
           fill
-          className="object-cover transition-transform duration-500 group-hover:scale-110"
+          className="object-cover transition-transform duration-700 group-hover:scale-105"
           quality={75}
         />
+        <div className="absolute inset-0 bg-[#301014]/0 group-hover:bg-[#301014]/10 transition-colors duration-500" />
       </div>
 
-      <div className="p-4 sm:p-6">
-        <h3 className="text-xl sm:text-2xl font-semibold text-[#301014] mb-2">{name}</h3>
-        <p className="text-sm sm:text-base text-[#51291E] mb-4 line-clamp-2">{description}</p>
-
-        <div className="flex items-center justify-between gap-3">
-          <span className="text-2xl sm:text-3xl font-bold text-[#F0D7A7]">
+      {/* Info */}
+      <div className="pt-4 pb-4">
+        <h3 className="text-lg sm:text-xl font-bold text-[#301014] group-hover:text-[#51291E] transition-colors duration-300 leading-snug">
+          {name}
+        </h3>
+        <p className="text-[#51291E]/50 text-sm mt-1 leading-relaxed line-clamp-2">
+          {description}
+        </p>
+        <div className="flex items-center justify-between gap-4 mt-4">
+          <span className="text-base font-mono tracking-[0.15em] text-[#301014]/60 font-semibold">
             ${price.toLocaleString()}
           </span>
-
           <button
             onClick={handleBuyClick}
-            className="px-4 py-2 sm:px-6 sm:py-3 bg-[#F0D7A7] hover:bg-[#F5E5C3] text-[#301014] font-semibold text-sm sm:text-base rounded-full transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-md hover:shadow-lg cursor-pointer whitespace-nowrap"
+            className="px-5 py-2 border border-[#301014] text-[#301014] text-sm font-semibold rounded-full hover:bg-[#301014] hover:text-[#F0D7A7] transition-all duration-300 cursor-pointer whitespace-nowrap active:scale-95"
           >
             Comprar
           </button>
