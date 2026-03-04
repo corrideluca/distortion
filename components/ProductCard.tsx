@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { deleteProduct } from '@/app/actions';
 import { useIsMobile } from '@/hooks/useIsMobile';
+import { useCart } from '@/context/CartContext';
 
 interface ProductCardProps {
   id: string;
@@ -32,13 +33,8 @@ export default function ProductCard({
   const [deleting, setDeleting] = useState(false);
   const [hovered, setHovered] = useState(false);
   const isMobile = useIsMobile();
+  const { dispatch } = useCart();
 
-  const handleBuyClick = () => {
-    const phoneNumber = '5491160286919';
-    const message = `Hola! Me gustaría pedir el producto: ${name} ($${price})`;
-    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
-    window.open(whatsappUrl, '_blank');
-  };
 
   return (
     <motion.div
@@ -46,7 +42,7 @@ export default function ProductCard({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '50px' }}
       transition={{ duration: 0.5, delay: index * 0.08 }}
-      className="group relative rounded-xl p-3 overflow-hidden"
+      className="group relative rounded-xl p-3 flex flex-col h-full"
       onMouseEnter={() => !isMobile && setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
@@ -121,22 +117,27 @@ export default function ProductCard({
       </div>
 
       {/* Info */}
-      <div className="pt-4 pb-4">
-        <h3 className="text-lg sm:text-xl font-bold text-[#000000] group-hover:text-[#666666] transition-colors duration-300 leading-snug">
+      <div className="pt-4 pb-3 flex flex-col flex-1">
+        <h3 className="text-lg sm:text-xl font-bold text-[#000000] group-hover:text-[#666666] transition-colors duration-300 leading-snug line-clamp-2 min-h-[3.5rem]">
           {name}
         </h3>
-        <p className="text-[#666666]/50 text-sm mt-1 leading-relaxed line-clamp-2">
+        <p className="text-[#666666]/50 text-sm mt-1 leading-relaxed line-clamp-2 min-h-[2.5rem]">
           {description}
         </p>
-        <div className="flex items-center justify-between gap-4 mt-4">
+        <div className="flex items-center justify-between gap-4 mt-auto pt-4">
           <span className="text-base font-mono tracking-[0.15em] text-[#000000]/60 font-semibold">
             ${price.toLocaleString()}
           </span>
           <button
-            onClick={handleBuyClick}
-            className="px-5 py-2 border border-[#000000] text-[#000000] text-sm font-semibold rounded-full hover:bg-[#000000] hover:text-[#ffffff] transition-all duration-300 cursor-pointer whitespace-nowrap active:scale-95"
+            onClick={() =>
+              dispatch({ type: "ADD_ITEM", payload: { id, name, price, image } })
+            }
+            className="flex items-center gap-1.5 px-5 py-2 border border-[#000000] text-[#000000] text-sm font-semibold rounded-full hover:bg-[#000000] hover:text-[#ffffff] transition-all duration-300 cursor-pointer whitespace-nowrap active:scale-95"
           >
-            Comprar
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
+            </svg>
+            Agregar
           </button>
         </div>
       </div>

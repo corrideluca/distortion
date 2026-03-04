@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Syne, Bebas_Neue } from "next/font/google";
 import "./globals.css";
+import { CartProvider } from "@/context/CartContext";
+import CartDrawer from "@/components/CartDrawer";
 
 const syne = Syne({
   subsets: ["latin"],
@@ -89,7 +91,10 @@ export default function RootLayout({
       <body
         className={`${syne.variable} ${bebas.variable} ${syne.className} antialiased`}
       >
-        {children}
+        <CartProvider>
+          {children}
+          <CartDrawer />
+        </CartProvider>
       </body>
     </html>
   );

@@ -15,6 +15,24 @@ import Footer from "@/components/Footer";
 
 const DEFAULT_HERO_IMAGE = "/hero.jpg";
 
+function extractDriveId(url: string): string {
+  const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+  return match ? match[1] : url.trim();
+}
+
+function toDriveDirectUrl(url: string): string {
+  return `https://drive.google.com/uc?export=view&id=${extractDriveId(url)}`;
+}
+
+function toDriveVideoUrl(url: string): string {
+  return `https://lh3.googleusercontent.com/d/${extractDriveId(url)}`;
+}
+
+function isVideoUrl(url: string): boolean {
+  const lower = url.toLowerCase();
+  return lower.endsWith(".mp4") || lower.endsWith(".webm") || lower.endsWith(".mov");
+}
+
 const testimonials = [
   {
     quote: "La calidad de las remeras es increíble, se nota la diferencia.",
@@ -193,6 +211,9 @@ function HomeContent() {
   const [logoUrl, setLogoUrl] = useState("/logo.png");
   const [showHeroEdit, setShowHeroEdit] = useState(false);
   const [heroImageInput, setHeroImageInput] = useState("");
+  const [heroIsDrive, setHeroIsDrive] = useState(false);
+  const [heroIsVideo, setHeroIsVideo] = useState(false);
+  const [heroIsDriveVideo, setHeroIsDriveVideo] = useState(false);
   const [logoInput, setLogoInput] = useState("");
   const [savingHero, setSavingHero] = useState(false);
 
@@ -212,12 +233,16 @@ function HomeContent() {
   }, [searchQ, searchArtist]);
 
   const fetchSettings = useCallback(async () => {
-    const [heroImg, logo] = await Promise.all([
+    const [heroImg, logo, isVideo, isDriveVid] = await Promise.all([
       getSetting("hero_image"),
       getSetting("hero_logo"),
+      getSetting("hero_is_video"),
+      getSetting("hero_is_drive_video"),
     ]);
     if (heroImg) setHeroImage(heroImg);
     if (logo) setLogoUrl(logo);
+    setHeroIsVideo(isVideo === "true");
+    setHeroIsDriveVideo(isDriveVid === "true");
   }, []);
 
   useEffect(() => {
@@ -232,9 +257,20 @@ function HomeContent() {
 
   const handleSaveHero = async () => {
     setSavingHero(true);
-    const newImage = heroImageInput.trim();
-    await updateSetting("hero_image", newImage);
+    let newImage = heroImageInput.trim();
+    const isVideo = newImage ? (heroIsVideo || isVideoUrl(newImage)) : false;
+    const isDriveVid = isVideo && heroIsDrive;
+    if (newImage && heroIsDrive) {
+      newImage = isDriveVid ? toDriveVideoUrl(newImage) : toDriveDirectUrl(newImage);
+    }
+    await Promise.all([
+      updateSetting("hero_image", newImage),
+      updateSetting("hero_is_video", isVideo ? "true" : "false"),
+      updateSetting("hero_is_drive_video", isDriveVid ? "true" : "false"),
+    ]);
     setHeroImage(newImage || DEFAULT_HERO_IMAGE);
+    setHeroIsVideo(isVideo);
+    setHeroIsDriveVideo(isDriveVid);
 
     const newLogo = logoInput.trim();
     await updateSetting("hero_logo", newLogo);
@@ -242,6 +278,7 @@ function HomeContent() {
 
     setSavingHero(false);
     setShowHeroEdit(false);
+    setHeroIsDrive(false);
   };
 
   return (
@@ -251,9 +288,22 @@ function HomeContent() {
 
       {/* Hero Banner Section */}
       <section
-        className="relative overflow-hidden h-[calc(100vh-64px)] sm:h-[90vh] min-h-[500px] sm:min-h-[600px] bg-fixed bg-cover bg-center"
-        style={{ backgroundImage: `url('${heroImage}')` }}
+        className={`relative overflow-hidden h-[calc(100vh-64px)] sm:h-[90vh] min-h-[500px] sm:min-h-[600px] ${
+          heroIsVideo ? "" : "bg-fixed bg-cover bg-center"
+        }`}
+        style={heroIsVideo ? undefined : { backgroundImage: `url('${heroImage}')` }}
       >
+        {/* Video background */}
+        {heroIsVideo && (
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="absolute inset-0 w-full h-full object-cover"
+            src={heroImage}
+          />
+        )}
         {/* Dark overlay */}
         <div className="absolute inset-0 bg-gradient-to-b from-[#000000]/70 via-[#000000]/50 to-[#000000]/80" />
 
@@ -265,6 +315,7 @@ function HomeContent() {
                 heroImage === DEFAULT_HERO_IMAGE ? "" : heroImage,
               );
               setLogoInput(logoUrl === "/logo.png" ? "" : logoUrl);
+              setHeroIsDrive(false);
               setShowHeroEdit(true);
             }}
             className="absolute left-4 top-1/2 -translate-y-1/2 z-20 bg-[#000000]/80 hover:bg-[#000000] text-[#ffffff] px-3 py-2 rounded-lg text-sm font-medium cursor-pointer transition-colors flex items-center gap-2"
@@ -303,15 +354,25 @@ function HomeContent() {
               </div>
 
               <label className="block text-sm font-medium text-[#666666] mb-1">
-                URL de Imagen de Fondo
+                URL de Imagen / Video de Fondo
               </label>
               <input
                 type="url"
                 value={heroImageInput}
                 onChange={(e) => setHeroImageInput(e.target.value)}
-                placeholder={DEFAULT_HERO_IMAGE}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl mb-4 text-[#000000] focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent text-sm"
+                placeholder={heroIsDrive ? "https://drive.google.com/file/d/..." : DEFAULT_HERO_IMAGE}
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl mb-1 text-[#000000] focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent text-sm"
               />
+              <div className="flex items-center gap-4 mb-4">
+                <label className="flex items-center gap-2 cursor-pointer select-none">
+                  <input type="checkbox" checked={heroIsDrive} onChange={(e) => setHeroIsDrive(e.target.checked)} className="rounded" />
+                  <span className="text-xs text-[#666666]">Es Drive</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer select-none">
+                  <input type="checkbox" checked={heroIsVideo} onChange={(e) => setHeroIsVideo(e.target.checked)} className="rounded" />
+                  <span className="text-xs text-[#666666]">Es Video (MP4)</span>
+                </label>
+              </div>
 
               <label className="block text-sm font-medium text-[#666666] mb-1">
                 URL del Logo
@@ -431,7 +492,7 @@ function HomeContent() {
                   {products.map((product, index) => (
                     <div
                       key={product.id}
-                      className="w-full sm:w-1/2 lg:w-1/4 flex-shrink-0 px-3"
+                      className="w-full sm:w-1/2 lg:w-1/4 flex-shrink-0 px-3 flex flex-col"
                     >
                       <ProductCard
                         {...product}
