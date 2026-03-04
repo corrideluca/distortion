@@ -59,7 +59,7 @@ export default function QuienesSomos() {
               transition={{ duration: 0.6, delay: 0.5 }}
               className="text-[#ffffff]/55 text-lg sm:text-xl max-w-md leading-relaxed"
             >
-              Marca independiente. Streetwear con identidad.
+              Cultura musical. Prendas con historia.
             </motion.p>
           </div>
         </div>
@@ -76,7 +76,7 @@ export default function QuienesSomos() {
             style={{ willChange: "transform, opacity" }}
           >
             <p className="text-[#000000] text-2xl sm:text-3xl font-semibold leading-snug">
-              &ldquo;Distortion nació del hartazgo de la ropa genérica. Queríamos algo con carácter, que se sintiera nuestro.&rdquo;
+              En Distortion diseñamos prendas exclusivas con referencias a la cultura musical que marcó a generaciones enteras.
             </p>
           </motion.div>
 
@@ -89,13 +89,13 @@ export default function QuienesSomos() {
             className="lg:pt-4 space-y-5"
           >
             <p className="text-[#666666]/65 text-base sm:text-lg leading-relaxed">
-              Empezamos con una idea simple: hacer remeras que quisiéramos usar nosotros mismos. Sin intermediarios, sin moldes de otras marcas. Solo diseño propio y calidad que se nota en cada prenda.
+              Cada prenda está pensada no solo como una pieza de ropa, sino como una forma de expresión personal.
             </p>
             <p className="text-[#666666]/65 text-base sm:text-lg leading-relaxed">
-              Hoy Distortion es una marca chica con ambición grande. Cada drop es limitado porque valoramos lo exclusivo por encima de lo masivo.
+              Lanzamos distintos drops, estos son una serie en la que celebraremos uno a uno a distintos referentes que dejaron huella en la historia del rock, recreando sus prendas originales, manteniendo los cortes y proporciones originales de la época.
             </p>
             <p className="text-[#666666]/65 text-base sm:text-lg leading-relaxed">
-              Cada prenda pasa por nuestras manos. Cada diseño tiene una historia detrás. Eso no cambia.
+              Creemos que vestir es una manera de contar quiénes somos, y por eso nuestras colecciones buscan conectar con quienes valoran la autenticidad, la música y el arte en todas sus formas.
             </p>
           </motion.div>
         </div>
@@ -107,18 +107,18 @@ export default function QuienesSomos() {
           {[
             {
               num: "01",
-              title: "Identidad",
-              text: "Cada diseño es original. No seguimos tendencias, las ignoramos y hacemos lo nuestro.",
+              title: "Expresión",
+              text: "Cada prenda es una forma de contar quién sos. Diseñamos para quienes visten con identidad.",
             },
             {
               num: "02",
-              title: "Calidad",
-              text: "Telas premium, costuras prolijas y estampados que no se van con el primer lavado.",
+              title: "Música",
+              text: "Celebramos a los referentes que dejaron huella en la historia del rock, recreando sus prendas icónicas.",
             },
             {
               num: "03",
-              title: "Comunidad",
-              text: "Distortion no es solo ropa, es la gente que la usa. Construimos algo juntos.",
+              title: "Autenticidad",
+              text: "Mantenemos los cortes y proporciones originales de la época. Cada detalle importa.",
             },
           ].map((item, i) => (
             <motion.div

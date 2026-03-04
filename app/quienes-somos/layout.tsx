@@ -3,15 +3,15 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Quiénes Somos",
   description:
-    "Conocé la historia de Sofía y SweetyBella. Pastelera apasionada desde temprana edad, comprometida con la calidad y el amor en cada creación artesanal.",
+    "En Distortion diseñamos prendas exclusivas con referencias a la cultura musical que marcó a generaciones enteras. Streetwear con identidad propia.",
   alternates: {
     canonical: "/quienes-somos",
   },
   openGraph: {
-    title: "Quiénes Somos | SweetyBella",
+    title: "Quiénes Somos | Distortion",
     description:
-      "Conocé la historia de Sofía y SweetyBella. Pastelera apasionada desde temprana edad.",
-    url: "https://sweetybella.com/quienes-somos",
+      "En Distortion diseñamos prendas exclusivas con referencias a la cultura musical que marcó a generaciones enteras.",
+    url: "https://distortionbrand.com/quienes-somos",
   },
 };
 

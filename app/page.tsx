@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback, useRef, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import Image from "next/image";
 import Navbar from "@/components/Navbar";
 import ProductCard from "@/components/ProductCard";
@@ -31,135 +31,6 @@ function toDriveVideoUrl(url: string): string {
 function isVideoUrl(url: string): boolean {
   const lower = url.toLowerCase();
   return lower.endsWith(".mp4") || lower.endsWith(".webm") || lower.endsWith(".mov");
-}
-
-const testimonials = [
-  {
-    quote: "La calidad de las remeras es increíble, se nota la diferencia.",
-    name: "Virginia Sangiuliano",
-  },
-  {
-    quote:
-      "El hoodie llegó perfecto, el diseño es una locura. Recomiendo 100%.",
-    name: "Corrado De Luca",
-  },
-  {
-    quote: "Pedí una remera custom y quedó exactamente como la imaginé.",
-    name: "Daniela Imbrogno",
-  },
-  {
-    quote: "Los drops se agotan rápido, atentos a las novedades.",
-    name: "Chiara Adamo Sangiuliano",
-  },
-  {
-    quote: "La tela y el acabado son de primera. Vale cada peso.",
-    name: "Agustin Casero",
-  },
-];
-
-function TestimonialsCarousel() {
-  const [current, setCurrent] = useState(0);
-  const [direction, setDirection] = useState(1);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setDirection(1);
-      setCurrent((prev) => (prev + 1) % testimonials.length);
-    }, 4000);
-    return () => clearInterval(timer);
-  }, []);
-
-  const goTo = (index: number) => {
-    setDirection(index > current ? 1 : -1);
-    setCurrent(index);
-  };
-
-  const initials = (name: string) =>
-    name
-      .split(" ")
-      .map((n) => n[0])
-      .join("")
-      .slice(0, 2)
-      .toUpperCase();
-
-  return (
-    <section
-      className="relative py-16 sm:py-24 px-4 overflow-hidden bg-fixed bg-cover bg-center"
-      style={{ backgroundImage: `url('${DEFAULT_HERO_IMAGE}')` }}
-    >
-      {/* Dark overlay */}
-      <div className="absolute inset-0 bg-[#000000]/55" />
-      <div className="max-w-lg mx-auto relative">
-        <motion.p
-          initial={{ opacity: 0, y: 10 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "50px" }}
-          transition={{ duration: 0.5 }}
-          className="text-xs tracking-[0.3em] uppercase text-white/70 mb-10 text-center"
-        >
-          Lo que dice la comunidad
-        </motion.p>
-
-        <div className="relative h-56 sm:h-48">
-          <AnimatePresence mode="wait" custom={direction}>
-            <motion.div
-              key={current}
-              custom={direction}
-              initial={{ opacity: 0, x: direction * 60 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: direction * -60 }}
-              transition={{ duration: 0.4, ease: "easeInOut" }}
-              style={{ willChange: "transform, opacity" }}
-              className="absolute inset-0"
-            >
-              {/* Chat bubble */}
-              <div className="relative bg-white rounded-2xl rounded-bl-none shadow-md px-6 py-5 mb-4">
-                <p className="text-lg sm:text-xl font-semibold text-[#000000] leading-snug">
-                  &ldquo;{testimonials[current].quote}&rdquo;
-                </p>
-                {/* Tail */}
-                <div
-                  className="absolute left-0 -bottom-4"
-                  style={{
-                    width: 0,
-                    height: 0,
-                    borderTop: "16px solid white",
-                    borderRight: "16px solid transparent",
-                  }}
-                />
-              </div>
-              {/* Avatar + name */}
-              <div className="flex items-center gap-3 pl-1 pt-3">
-                <div className="w-8 h-8 rounded-full bg-[#ffffff]/15 border border-[#ffffff]/30 flex items-center justify-center shrink-0">
-                  <span className="text-[#ffffff] text-xs font-bold">
-                    {initials(testimonials[current].name)}
-                  </span>
-                </div>
-                <span className="text-sm font-medium text-white/70">
-                  {testimonials[current].name}
-                </span>
-              </div>
-            </motion.div>
-          </AnimatePresence>
-        </div>
-
-        {/* Dots */}
-        <div className="flex items-center justify-center gap-3 mt-6">
-          {testimonials.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => goTo(i)}
-              className={`transition-all duration-300 rounded-full cursor-pointer ${
-                i === current
-                  ? "w-6 h-2 bg-[#ffffff]"
-                  : "w-2 h-2 bg-[#ffffff]/25 hover:bg-[#ffffff]/50"
-              }`}
-            />
-          ))}
-        </div>
-      </div>
-    </section>
-  );
 }
 
 interface Product {
@@ -557,9 +428,6 @@ function HomeContent() {
           )}
         </div>
       </section>
-
-      {/* Testimonials Carousel */}
-      <TestimonialsCarousel />
 
       <Footer />
     </div>
