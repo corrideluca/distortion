@@ -3,140 +3,213 @@
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
+
+interface Artist {
+  id: string;
+  name: string;
+  slug?: string | null;
+}
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [artistsOpen, setArtistsOpen] = useState(false);
+  const [artists, setArtists] = useState<Artist[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
-    };
-
+    const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const handleContactClick = () => {
-    const phoneNumber = "5491168801698";
-    const message = "Hola! Me gustaría obtener más información.";
-    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
-    window.open(whatsappUrl, "_blank");
+  useEffect(() => {
+    fetch("/api/artists")
+      .then((r) => r.json())
+      .then((data) => Array.isArray(data) && setArtists(data))
+      .catch(() => {});
+  }, []);
+
+  const openArtists = () => {
+    if (closeTimer.current) clearTimeout(closeTimer.current);
+    setArtistsOpen(true);
   };
+
+  const scheduleClose = () => {
+    closeTimer.current = setTimeout(() => setArtistsOpen(false), 120);
+  };
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    const q = searchQuery.trim();
+    router.push(q ? `/?q=${encodeURIComponent(q)}` : "/");
+    setMobileMenuOpen(false);
+  };
+
+  const handleContactClick = () => {
+    window.open(
+      `https://wa.me/5491160286919?text=${encodeURIComponent("Hola! Me gustaría obtener más información.")}`,
+      "_blank"
+    );
+  };
+
+  const artistHref = (a: Artist) =>
+    a.slug ? `/artistas/${a.slug}` : `/?artist=${a.id}`;
 
   return (
     <motion.nav
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ duration: 0.6 }}
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b border-black/10 ${
         scrolled
-          ? "bg-[#301014]/95 backdrop-blur-md shadow-lg"
-          : "bg-[#301014]/80 backdrop-blur-sm"
+          ? "bg-white/90 backdrop-blur-md shadow-sm"
+          : "bg-white/70 backdrop-blur-md"
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 sm:h-20">
+        <div className="flex items-center h-16 sm:h-20 gap-6">
+
           {/* Logo */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="flex items-center"
-          >
-            <Link href="/" className="flex items-center gap-2 sm:gap-3 hover:scale-110 transition-all duration-300 cursor-pointer">
-              <Image
-                src="/logo.png"
-                width={200}
-                height={100}
-                alt="SweetyBella"
-                className="object-contain"
-              />
-            </Link>
-          </motion.div>
+          <Link href="/" className="flex-shrink-0 hover:opacity-75 transition-opacity">
+            <Image
+              src="/logo.png"
+              width={100}
+              height={50}
+              alt="Distortion"
+              className="object-contain h-24 w-auto"
+            />
+          </Link>
 
-          {/* Desktop Navigation Links */}
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            className="hidden md:flex items-center gap-6 lg:gap-8"
-          >
-            <a
-              href="/#products"
-              className="text-[#EDF4ED] hover:text-[#F0D7A7] transition-colors duration-300 font-medium text-lg"
-            >
-              Productos
-            </a>
+          {/* Desktop nav links */}
+          <div className="hidden md:flex items-center gap-6">
 
-            <Link
-              href="/quienes-somos"
-              className="text-[#EDF4ED] hover:text-[#F0D7A7] transition-colors duration-300 font-medium text-lg"
+            {/* Artistas trigger */}
+            <button
+              onMouseEnter={openArtists}
+              onMouseLeave={scheduleClose}
+              className="flex items-center gap-1.5 text-[#000000] hover:text-[#444444] transition-colors font-medium text-base cursor-pointer select-none"
             >
-              Quiénes Somos
-            </Link>
-
-            <Link
-              href="/pedidos"
-              className="text-[#EDF4ED] hover:text-[#F0D7A7] transition-colors duration-300 font-medium text-lg"
-            >
-              Pedidos
-            </Link>
+              Artistas
+              <svg
+                className={`w-3.5 h-3.5 transition-transform duration-300 ${artistsOpen ? "rotate-180" : ""}`}
+                fill="none" stroke="currentColor" viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
 
             <button
               onClick={handleContactClick}
-              className="px-4 py-2 lg:px-6 lg:py-3 bg-[#F0D7A7] hover:bg-[#F5E5C3] text-[#301014] font-semibold rounded-full transition-all duration-300 transform hover:scale-105 shadow-md hover:shadow-lg cursor-pointer flex items-center gap-2"
+              className="text-[#000000] hover:text-[#666666] transition-colors font-medium text-base cursor-pointer"
             >
-              <svg
-                className="w-5 h-5"
-                fill="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" />
-              </svg>
-              <span className="hidden lg:inline">Contacto</span>
+              Contacto
             </button>
-          </motion.div>
 
-          {/* Mobile Menu Button */}
-          <motion.button
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
+            <Link
+              href="/quienes-somos"
+              className="text-[#000000] hover:text-[#666666] transition-colors font-medium text-base"
+            >
+              Quiénes Somos
+            </Link>
+          </div>
+
+          {/* Search */}
+          <form onSubmit={handleSearch} className="hidden md:flex items-center ml-auto">
+            <div className="relative">
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Buscar..."
+                className="w-44 lg:w-60 pl-4 pr-10 py-2 text-sm bg-[#f5f5f5] border border-black/10 rounded-full focus:outline-none focus:ring-1 focus:ring-black/30 focus:bg-white transition-all"
+              />
+              <button
+                type="submit"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#666666] hover:text-[#000000] transition-colors cursor-pointer"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </button>
+            </div>
+          </form>
+
+          {/* Mobile hamburger */}
+          <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden text-[#F0D7A7] p-2"
+            className="md:hidden text-[#000000] p-2 ml-auto"
             aria-label="Toggle menu"
           >
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               {mobileMenuOpen ? (
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               ) : (
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
               )}
             </svg>
-          </motion.button>
+          </button>
         </div>
       </div>
 
-      {/* Mobile Menu */}
+      {/* ── Mega-menu panel ── */}
+      <AnimatePresence>
+        {artistsOpen && (
+          <motion.div
+            onMouseEnter={openArtists}
+            onMouseLeave={scheduleClose}
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.22, ease: "easeOut" }}
+            className="hidden md:block absolute top-full left-0 right-0 bg-white/95 backdrop-blur-md border-b border-black/[0.07] shadow-[0_12px_40px_rgba(0,0,0,0.10)]"
+          >
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+              {artists.length === 0 ? (
+                <p className="text-sm text-[#888]">Sin artistas aún.</p>
+              ) : (
+                <>
+                  <p className="text-[10px] tracking-[0.3em] uppercase text-[#999] mb-5">
+                    Artistas
+                  </p>
+                  <div className="flex flex-wrap gap-x-8 gap-y-3">
+                    {artists.map((artist, i) => (
+                      <motion.div
+                        key={artist.id}
+                        initial={{ opacity: 0, y: 6 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.18, delay: i * 0.035 }}
+                      >
+                        <Link
+                          href={artistHref(artist)}
+                          onClick={() => setArtistsOpen(false)}
+                          className="group flex items-center gap-2 text-[#111] hover:text-black transition-colors"
+                        >
+                          <span className="text-base font-semibold tracking-tight group-hover:translate-x-0.5 transition-transform duration-150">
+                            {artist.name}
+                          </span>
+                          <svg
+                            className="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 -translate-x-1 group-hover:translate-x-0 transition-all duration-150 text-black/40"
+                            fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                          >
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                          </svg>
+                        </Link>
+                      </motion.div>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ── Mobile menu ── */}
       <AnimatePresence>
         {mobileMenuOpen && (
           <motion.div
@@ -144,50 +217,60 @@ export default function Navbar() {
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.3 }}
-            className="md:hidden bg-[#301014] border-t border-[#F0D7A7]/20"
+            className="md:hidden bg-white/95 backdrop-blur-md border-t border-black/10"
           >
             <div className="px-4 py-4 space-y-3">
-              <a
-                href="/#products"
-                onClick={() => setMobileMenuOpen(false)}
-                className="block text-[#EDF4ED] hover:text-[#F0D7A7] transition-colors duration-300 font-medium text-lg py-2"
+              {/* Mobile search */}
+              <form onSubmit={handleSearch} className="flex items-center">
+                <div className="relative w-full">
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Buscar..."
+                    className="w-full pl-4 pr-10 py-2 text-sm bg-[#f5f5f5] border border-black/10 rounded-full focus:outline-none focus:ring-1 focus:ring-black/30"
+                  />
+                  <button type="submit" className="absolute right-3 top-1/2 -translate-y-1/2 text-[#666666]">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                  </button>
+                </div>
+              </form>
+
+              {/* Artists list */}
+              <div>
+                <p className="text-xs uppercase tracking-widest text-[#666666] mb-2 mt-1">Artistas</p>
+                {artists.length === 0 ? (
+                  <p className="text-sm text-[#666666] py-1">Sin artistas aún</p>
+                ) : (
+                  artists.map((artist) => (
+                    <Link
+                      key={artist.id}
+                      href={artistHref(artist)}
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="block text-[#000000] hover:text-[#666666] transition-colors font-medium text-base py-1.5"
+                    >
+                      {artist.name}
+                    </Link>
+                  ))
+                )}
+              </div>
+
+              <button
+                onClick={() => { handleContactClick(); setMobileMenuOpen(false); }}
+                className="block text-[#000000] hover:text-[#666666] transition-colors font-medium text-lg py-2 cursor-pointer"
               >
-                Productos
-              </a>
+                Contacto
+              </button>
 
               <Link
                 href="/quienes-somos"
                 onClick={() => setMobileMenuOpen(false)}
-                className="block text-[#EDF4ED] hover:text-[#F0D7A7] transition-colors duration-300 font-medium text-lg py-2"
+                className="block text-[#000000] hover:text-[#666666] transition-colors font-medium text-lg py-2"
               >
                 Quiénes Somos
               </Link>
-
-              <Link
-                href="/pedidos"
-                onClick={() => setMobileMenuOpen(false)}
-                className="block text-[#EDF4ED] hover:text-[#F0D7A7] transition-colors duration-300 font-medium text-lg py-2"
-              >
-                Pedidos
-              </Link>
-
-              <button
-                onClick={() => {
-                  handleContactClick();
-                  setMobileMenuOpen(false);
-                }}
-                className="w-full px-6 py-3 bg-[#F0D7A7] hover:bg-[#F5E5C3] text-[#301014] font-semibold rounded-full transition-all duration-300 shadow-md flex items-center justify-center gap-2"
-              >
-                <svg
-                  className="w-5 h-5"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" />
-                </svg>
-                Contacto
-              </button>
             </div>
           </motion.div>
         )}

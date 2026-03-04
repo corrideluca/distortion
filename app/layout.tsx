@@ -1,40 +1,43 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Syne, Bebas_Neue } from "next/font/google";
 import "./globals.css";
-import CursorCake from "@/components/CursorCake";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const syne = Syne({
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
+  variable: "--font-syne",
+  display: "swap",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const bebas = Bebas_Neue({
+  weight: "400",
   subsets: ["latin"],
+  variable: "--font-bebas",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://sweetybella.com"),
+  metadataBase: new URL("https://distortionbrand.com"),
   title: {
-    default: "SweetyBella - Pastelería Artesanal",
-    template: "%s | SweetyBella",
+    default: "Distortion - Streetwear",
+    template: "%s | Distortion",
   },
   description:
-    "Descubrí nuestros productos artesanales hechos con amor: tortas, alfajores, brownies y más. Pedidos personalizados para cada ocasión en Gral. Pacheco, Buenos Aires.",
+    "Distortion es una marca de streetwear independiente. Remeras, hoodies y accesorios con identidad propia. Drops limitados y pedidos personalizados.",
   keywords: [
-    "pastelería artesanal",
-    "repostería",
-    "tortas personalizadas",
-    "alfajores",
-    "brownies",
-    "SweetyBella",
-    "Gral. Pacheco",
+    "streetwear",
+    "remeras",
+    "hoodies",
+    "indumentaria",
+    "Distortion",
+    "ropa urbana",
+    "drops",
     "Buenos Aires",
-    "pedidos a domicilio",
-    "pastelería casera",
+    "marca independiente",
+    "custom",
   ],
-  authors: [{ name: "Sofía", url: "https://sweetybella.com" }],
-  creator: "SweetyBella",
+  authors: [{ name: "Distortion", url: "https://distortionbrand.com" }],
+  creator: "Distortion",
   robots: {
     index: true,
     follow: true,
@@ -47,11 +50,11 @@ export const metadata: Metadata = {
     canonical: "/",
   },
   openGraph: {
-    title: "SweetyBella - Pastelería Artesanal",
+    title: "Distortion - Streetwear",
     description:
-      "Productos artesanales hechos con amor y los mejores ingredientes. Tortas, alfajores y brownies para cada ocasión.",
-    url: "https://sweetybella.com",
-    siteName: "SweetyBella",
+      "Remeras, hoodies y accesorios con identidad propia. Drops limitados y pedidos personalizados.",
+    url: "https://distortionbrand.com",
+    siteName: "Distortion",
     locale: "es_AR",
     type: "website",
     images: [
@@ -59,15 +62,15 @@ export const metadata: Metadata = {
         url: "/logo.png",
         width: 800,
         height: 400,
-        alt: "SweetyBella - Pastelería Artesanal",
+        alt: "Distortion - Streetwear",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "SweetyBella - Pastelería Artesanal",
+    title: "Distortion - Streetwear",
     description:
-      "Productos artesanales hechos con amor y los mejores ingredientes.",
+      "Remeras, hoodies y accesorios con identidad propia. Drops limitados.",
     images: ["/logo.png"],
   },
   icons: {
@@ -84,9 +87,8 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${syne.variable} ${bebas.variable} ${syne.className} antialiased`}
       >
-        <CursorCake />
         {children}
       </body>
     </html>

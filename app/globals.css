@@ -1,31 +1,40 @@
 @import "tailwindcss";
 
 :root {
-  /* SweetyBella Color Palette */
-  --color-primary-dark: #301014;    /* Dark burgundy/maroon */
-  --color-primary-brown: #51291E;   /* Brown */
-  --color-accent-beige: #F0D7A7;    /* Warm beige accent */
-  --color-accent-light: #F5E5C3;    /* Light beige accent */
-  --color-background: #EDF4ED;      /* Off-white/cream */
+  /* Distortion Color Palette — Black & White */
+  --color-primary-dark: #000000;
+  --color-secondary:    #666666;
+  --color-accent:       #ffffff;
+  --color-accent-hover: #ebebeb;
+  --color-background:   #f5f5f5;
 
-  --background: #EDF4ED;
-  --foreground: #301014;
+  --background: #f5f5f5;
+  --foreground: #000000;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-syne);
+  --font-display: var(--font-bebas);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-syne), sans-serif;
 }
 
 /* Smooth scroll behavior */
 html {
   scroll-behavior: smooth;
+}
+
+/* Hide scrollbar for carousels */
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
 }

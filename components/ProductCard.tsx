@@ -34,7 +34,7 @@ export default function ProductCard({
   const isMobile = useIsMobile();
 
   const handleBuyClick = () => {
-    const phoneNumber = '5491168801698';
+    const phoneNumber = '5491160286919';
     const message = `Hola! Me gustaría pedir el producto: ${name} ($${price})`;
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
@@ -57,25 +57,25 @@ export default function ProductCard({
       <span className="hidden md:block pointer-events-none">
         {/* Top */}
         <motion.span
-          className="absolute top-0 left-0 h-px bg-[#301014]/30 w-full origin-left"
+          className="absolute top-0 left-0 h-px bg-[#000000]/30 w-full origin-left"
           animate={{ scaleX: hovered ? 1 : 0 }}
           transition={{ duration: 0.25, ease: 'easeInOut', delay: hovered ? 0 : 0 }}
         />
         {/* Right */}
         <motion.span
-          className="absolute top-0 right-0 w-px bg-[#301014]/30 h-full origin-top"
+          className="absolute top-0 right-0 w-px bg-[#000000]/30 h-full origin-top"
           animate={{ scaleY: hovered ? 1 : 0 }}
           transition={{ duration: 0.25, ease: 'easeInOut', delay: hovered ? 0.2 : 0 }}
         />
         {/* Bottom */}
         <motion.span
-          className="absolute bottom-0 right-0 h-px bg-[#301014]/30 w-full origin-right"
+          className="absolute bottom-0 right-0 h-px bg-[#000000]/30 w-full origin-right"
           animate={{ scaleX: hovered ? 1 : 0 }}
           transition={{ duration: 0.25, ease: 'easeInOut', delay: hovered ? 0.4 : 0 }}
         />
         {/* Left */}
         <motion.span
-          className="absolute bottom-0 left-0 w-px bg-[#301014]/30 h-full origin-bottom"
+          className="absolute bottom-0 left-0 w-px bg-[#000000]/30 h-full origin-bottom"
           animate={{ scaleY: hovered ? 1 : 0 }}
           transition={{ duration: 0.25, ease: 'easeInOut', delay: hovered ? 0.6 : 0 }}
         />
@@ -85,7 +85,7 @@ export default function ProductCard({
         <div className="absolute top-3 right-3 z-10 flex gap-2">
           <button
             onClick={() => onEdit?.()}
-            className="bg-[#301014] hover:bg-[#51291E] text-[#F0D7A7] w-8 h-8 rounded-full flex items-center justify-center shadow-lg transition-colors cursor-pointer"
+            className="bg-[#000000] hover:bg-[#666666] text-[#ffffff] w-8 h-8 rounded-full flex items-center justify-center shadow-lg transition-colors cursor-pointer"
             title="Editar producto"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -109,7 +109,7 @@ export default function ProductCard({
       )}
 
       {/* Image */}
-      <div className="relative aspect-[4/3] overflow-hidden rounded-lg bg-[#F5EFE6]">
+      <div className="relative aspect-[4/3] overflow-hidden rounded-lg bg-[#f0f0f0]">
         <Image
           src={image}
           alt={name}
@@ -117,24 +117,24 @@ export default function ProductCard({
           className="object-cover transition-transform duration-700 group-hover:scale-105"
           quality={75}
         />
-        <div className="absolute inset-0 bg-[#301014]/0 group-hover:bg-[#301014]/10 transition-colors duration-500" />
+        <div className="absolute inset-0 bg-[#000000]/0 group-hover:bg-[#000000]/10 transition-colors duration-500" />
       </div>
 
       {/* Info */}
       <div className="pt-4 pb-4">
-        <h3 className="text-lg sm:text-xl font-bold text-[#301014] group-hover:text-[#51291E] transition-colors duration-300 leading-snug">
+        <h3 className="text-lg sm:text-xl font-bold text-[#000000] group-hover:text-[#666666] transition-colors duration-300 leading-snug">
           {name}
         </h3>
-        <p className="text-[#51291E]/50 text-sm mt-1 leading-relaxed line-clamp-2">
+        <p className="text-[#666666]/50 text-sm mt-1 leading-relaxed line-clamp-2">
           {description}
         </p>
         <div className="flex items-center justify-between gap-4 mt-4">
-          <span className="text-base font-mono tracking-[0.15em] text-[#301014]/60 font-semibold">
+          <span className="text-base font-mono tracking-[0.15em] text-[#000000]/60 font-semibold">
             ${price.toLocaleString()}
           </span>
           <button
             onClick={handleBuyClick}
-            className="px-5 py-2 border border-[#301014] text-[#301014] text-sm font-semibold rounded-full hover:bg-[#301014] hover:text-[#F0D7A7] transition-all duration-300 cursor-pointer whitespace-nowrap active:scale-95"
+            className="px-5 py-2 border border-[#000000] text-[#000000] text-sm font-semibold rounded-full hover:bg-[#000000] hover:text-[#ffffff] transition-all duration-300 cursor-pointer whitespace-nowrap active:scale-95"
           >
             Comprar
           </button>

@@ -10,12 +10,28 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Artist {
+  id        String    @id @default(cuid())
+  name      String
+  slug      String?   @unique
+  bio       String?   @db.Text
+  image     String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  products  Product[]
+
+  @@map("artists")
+}
+
 model Product {
   id          String   @id @default(cuid())
   name        String
   description String   @db.Text
   price       Float
   image       String
+  category    String?
+  artistId    String?
+  artist      Artist?  @relation(fields: [artistId], references: [id], onDelete: SetNull)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 

@@ -2,14 +2,14 @@ import { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "SweetyBella - Pastelería Artesanal",
-    short_name: "SweetyBella",
+    name: "Distortion - Streetwear",
+    short_name: "Distortion",
     description:
-      "Productos artesanales hechos con amor y los mejores ingredientes",
+      "Remeras, hoodies y accesorios con identidad propia. Drops limitados.",
     start_url: "/",
     display: "standalone",
-    background_color: "#301014",
-    theme_color: "#301014",
+    background_color: "#000000",
+    theme_color: "#000000",
     icons: [
       {
         src: "/logo.png",

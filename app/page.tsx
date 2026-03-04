@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState, useCallback, Suspense } from "react";
+import { useEffect, useState, useCallback, useRef, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import Navbar from "@/components/Navbar";
@@ -12,18 +13,30 @@ import AdminOverlay, {
 import { getSetting, updateSetting } from "@/app/actions";
 import Footer from "@/components/Footer";
 
-const DEFAULT_HERO_IMAGE =
-  "https://images.unsplash.com/photo-1509440159596-0249088772ff?q=80&w=2072&auto=format&fit=crop";
+const DEFAULT_HERO_IMAGE = "/hero.jpg";
 
 const testimonials = [
-  { quote: "El rogel es una Bomba 💣💣 ", name: "Virginia Sangiuliano" },
   {
-    quote: "Amé la pastafrola!! muy rica, super recomiendo",
+    quote: "La calidad de las remeras es increíble, se nota la diferencia.",
+    name: "Virginia Sangiuliano",
+  },
+  {
+    quote:
+      "El hoodie llegó perfecto, el diseño es una locura. Recomiendo 100%.",
     name: "Corrado De Luca",
   },
-  { quote: "Las trufas son lo más!", name: "Daniela Imbrogno" },
-  { quote: "Muy ricos los alfajorcitoos.", name: "Chiara Adamo Sangiuliano" },
-  { quote: "Muy rico el Brownie, se nota la calidad", name: "Agustin Casero" },
+  {
+    quote: "Pedí una remera custom y quedó exactamente como la imaginé.",
+    name: "Daniela Imbrogno",
+  },
+  {
+    quote: "Los drops se agotan rápido, atentos a las novedades.",
+    name: "Chiara Adamo Sangiuliano",
+  },
+  {
+    quote: "La tela y el acabado son de primera. Vale cada peso.",
+    name: "Agustin Casero",
+  },
 ];
 
 function TestimonialsCarousel() {
@@ -57,7 +70,7 @@ function TestimonialsCarousel() {
       style={{ backgroundImage: `url('${DEFAULT_HERO_IMAGE}')` }}
     >
       {/* Dark overlay */}
-      <div className="absolute inset-0 bg-[#301014]/55" />
+      <div className="absolute inset-0 bg-[#000000]/55" />
       <div className="max-w-lg mx-auto relative">
         <motion.p
           initial={{ opacity: 0, y: 10 }}
@@ -66,7 +79,7 @@ function TestimonialsCarousel() {
           transition={{ duration: 0.5 }}
           className="text-xs tracking-[0.3em] uppercase text-white/70 mb-10 text-center"
         >
-          Lo que dicen nuestros clientes
+          Lo que dice la comunidad
         </motion.p>
 
         <div className="relative h-56 sm:h-48">
@@ -83,7 +96,7 @@ function TestimonialsCarousel() {
             >
               {/* Chat bubble */}
               <div className="relative bg-white rounded-2xl rounded-bl-none shadow-md px-6 py-5 mb-4">
-                <p className="text-lg sm:text-xl font-semibold text-[#301014] leading-snug">
+                <p className="text-lg sm:text-xl font-semibold text-[#000000] leading-snug">
                   &ldquo;{testimonials[current].quote}&rdquo;
                 </p>
                 {/* Tail */}
@@ -99,8 +112,8 @@ function TestimonialsCarousel() {
               </div>
               {/* Avatar + name */}
               <div className="flex items-center gap-3 pl-1 pt-3">
-                <div className="w-8 h-8 rounded-full bg-[#F0D7A7]/15 border border-[#F0D7A7]/30 flex items-center justify-center shrink-0">
-                  <span className="text-[#F0D7A7] text-xs font-bold">
+                <div className="w-8 h-8 rounded-full bg-[#ffffff]/15 border border-[#ffffff]/30 flex items-center justify-center shrink-0">
+                  <span className="text-[#ffffff] text-xs font-bold">
                     {initials(testimonials[current].name)}
                   </span>
                 </div>
@@ -120,8 +133,8 @@ function TestimonialsCarousel() {
               onClick={() => goTo(i)}
               className={`transition-all duration-300 rounded-full cursor-pointer ${
                 i === current
-                  ? "w-6 h-2 bg-[#F0D7A7]"
-                  : "w-2 h-2 bg-[#F0D7A7]/25 hover:bg-[#F0D7A7]/50"
+                  ? "w-6 h-2 bg-[#ffffff]"
+                  : "w-2 h-2 bg-[#ffffff]/25 hover:bg-[#ffffff]/50"
               }`}
             />
           ))}
@@ -137,14 +150,43 @@ interface Product {
   description: string;
   price: number;
   image: string;
+  artistId?: string | null;
+  artist?: { id: string; name: string } | null;
 }
 
 function HomeContent() {
+  const searchParams = useSearchParams();
+  const searchQ = searchParams.get("q") || "";
+  const searchArtist = searchParams.get("artist") || "";
+
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [adminAuthed, setAdminAuthed] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+
+  // Carousel
+  const carouselRef = useRef<HTMLDivElement>(null);
+  const [carouselCanLeft, setCarouselCanLeft] = useState(false);
+  const [carouselCanRight, setCarouselCanRight] = useState(true);
+
+  const updateCarouselArrows = useCallback(() => {
+    const el = carouselRef.current;
+    if (!el) return;
+    setCarouselCanLeft(el.scrollLeft > 0);
+    setCarouselCanRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 1);
+  }, []);
+
+  const scrollCarousel = useCallback((dir: "left" | "right") => {
+    const el = carouselRef.current;
+    if (!el) return;
+    const firstItem = el.firstElementChild as HTMLElement;
+    const amount = firstItem ? firstItem.offsetWidth : el.clientWidth / 4;
+    el.scrollBy({
+      left: dir === "left" ? -amount : amount,
+      behavior: "smooth",
+    });
+  }, []);
 
   // Hero settings
   const [heroImage, setHeroImage] = useState(DEFAULT_HERO_IMAGE);
@@ -156,15 +198,18 @@ function HomeContent() {
 
   const fetchProducts = useCallback(async () => {
     try {
-      const response = await fetch("/api/products");
+      const params = new URLSearchParams();
+      if (searchQ) params.set("q", searchQ);
+      if (searchArtist) params.set("artist", searchArtist);
+      const response = await fetch(`/api/products?${params.toString()}`);
       const data = await response.json();
-      setProducts(data);
+      setProducts(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error("Error fetching products:", error);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [searchQ, searchArtist]);
 
   const fetchSettings = useCallback(async () => {
     const [heroImg, logo] = await Promise.all([
@@ -179,6 +224,11 @@ function HomeContent() {
     fetchProducts();
     fetchSettings();
   }, [fetchProducts, fetchSettings]);
+
+  useEffect(() => {
+    const timer = setTimeout(updateCarouselArrows, 50);
+    return () => clearTimeout(timer);
+  }, [products, updateCarouselArrows]);
 
   const handleSaveHero = async () => {
     setSavingHero(true);
@@ -195,7 +245,7 @@ function HomeContent() {
   };
 
   return (
-    <div className="min-h-screen bg-[#EDF4ED]">
+    <div className="min-h-screen bg-[#f5f5f5]">
       <AdminOverlay onRefresh={fetchProducts} onAuthChange={setAdminAuthed} />
       <Navbar />
 
@@ -205,7 +255,7 @@ function HomeContent() {
         style={{ backgroundImage: `url('${heroImage}')` }}
       >
         {/* Dark overlay */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#301014]/70 via-[#301014]/50 to-[#301014]/80" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#000000]/70 via-[#000000]/50 to-[#000000]/80" />
 
         {/* Admin edit banner button */}
         {adminAuthed && (
@@ -217,7 +267,7 @@ function HomeContent() {
               setLogoInput(logoUrl === "/logo.png" ? "" : logoUrl);
               setShowHeroEdit(true);
             }}
-            className="absolute left-4 top-1/2 -translate-y-1/2 z-20 bg-[#301014]/80 hover:bg-[#301014] text-[#F0D7A7] px-3 py-2 rounded-lg text-sm font-medium cursor-pointer transition-colors flex items-center gap-2"
+            className="absolute left-4 top-1/2 -translate-y-1/2 z-20 bg-[#000000]/80 hover:bg-[#000000] text-[#ffffff] px-3 py-2 rounded-lg text-sm font-medium cursor-pointer transition-colors flex items-center gap-2"
           >
             <svg
               className="w-4 h-4"
@@ -241,18 +291,18 @@ function HomeContent() {
           <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
             <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-bold text-[#301014]">
+                <h2 className="text-xl font-bold text-[#000000]">
                   Editar Banner
                 </h2>
                 <button
                   onClick={() => setShowHeroEdit(false)}
-                  className="text-[#51291E]/50 hover:text-[#301014] text-2xl leading-none cursor-pointer"
+                  className="text-[#666666]/50 hover:text-[#000000] text-2xl leading-none cursor-pointer"
                 >
                   &times;
                 </button>
               </div>
 
-              <label className="block text-sm font-medium text-[#51291E] mb-1">
+              <label className="block text-sm font-medium text-[#666666] mb-1">
                 URL de Imagen de Fondo
               </label>
               <input
@@ -260,10 +310,10 @@ function HomeContent() {
                 value={heroImageInput}
                 onChange={(e) => setHeroImageInput(e.target.value)}
                 placeholder={DEFAULT_HERO_IMAGE}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl mb-4 text-[#301014] focus:outline-none focus:ring-2 focus:ring-[#F0D7A7] focus:border-transparent text-sm"
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl mb-4 text-[#000000] focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent text-sm"
               />
 
-              <label className="block text-sm font-medium text-[#51291E] mb-1">
+              <label className="block text-sm font-medium text-[#666666] mb-1">
                 URL del Logo
               </label>
               <input
@@ -271,24 +321,24 @@ function HomeContent() {
                 value={logoInput}
                 onChange={(e) => setLogoInput(e.target.value)}
                 placeholder="/logo.png"
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl mb-4 text-[#301014] focus:outline-none focus:ring-2 focus:ring-[#F0D7A7] focus:border-transparent text-sm"
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl mb-4 text-[#000000] focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent text-sm"
               />
 
-              <p className="text-xs text-[#51291E]/50 mb-4">
+              <p className="text-xs text-[#666666]/50 mb-4">
                 Dejá vacío para usar los valores por defecto.
               </p>
 
               <div className="flex gap-3">
                 <button
                   onClick={() => setShowHeroEdit(false)}
-                  className="flex-1 py-3 border border-gray-200 text-[#51291E] font-semibold rounded-xl hover:bg-gray-50 transition-colors cursor-pointer"
+                  className="flex-1 py-3 border border-gray-200 text-[#666666] font-semibold rounded-xl hover:bg-gray-50 transition-colors cursor-pointer"
                 >
                   Cancelar
                 </button>
                 <button
                   onClick={handleSaveHero}
                   disabled={savingHero}
-                  className="flex-1 py-3 bg-[#301014] text-[#F0D7A7] font-bold rounded-xl hover:bg-[#51291E] transition-colors disabled:opacity-50 cursor-pointer"
+                  className="flex-1 py-3 bg-[#000000] text-[#ffffff] font-bold rounded-xl hover:bg-[#666666] transition-colors disabled:opacity-50 cursor-pointer"
                 >
                   {savingHero ? "Guardando..." : "Guardar"}
                 </button>
@@ -296,67 +346,12 @@ function HomeContent() {
             </div>
           </div>
         )}
-
-        {/* Hero Content */}
-        <div className="relative h-full flex items-center justify-center">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.4 }}
-            >
-              <Image
-                src={logoUrl}
-                width={200}
-                height={100}
-                alt="SweetyBella"
-                className="object-contain min-w-[25rem] mx-auto"
-              />
-              <motion.p
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.8 }}
-                className="text-lg sm:text-2xl lg:text-3xl text-[#EDF4ED] mb-8 sm:mb-10 max-w-3xl mx-auto px-4"
-              >
-                Productos artesanales hechos con amor y los mejores ingredientes
-              </motion.p>
-
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 1 }}
-              >
-                <a
-                  href="#products"
-                  className="inline-block px-8 py-4 sm:px-10 sm:py-5 bg-[#F0D7A7] hover:bg-[#F5E5C3] text-[#301014] font-bold text-base sm:text-lg rounded-full transition-all duration-300 transform hover:scale-105 shadow-2xl hover:shadow-3xl cursor-pointer"
-                >
-                  Ver Productos
-                </a>
-              </motion.div>
-            </motion.div>
-          </div>
-        </div>
-
-        {/* Decorative wave */}
-        <div className="absolute bottom-0 left-0 right-0">
-          <svg
-            viewBox="0 0 1440 120"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            className="w-full h-auto"
-          >
-            <path
-              d="M0 120L60 105C120 90 240 60 360 45C480 30 600 30 720 37.5C840 45 960 60 1080 67.5C1200 75 1320 75 1380 75L1440 75V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0Z"
-              fill="#EDF4ED"
-            />
-          </svg>
-        </div>
       </section>
 
       {/* Products Section */}
       <section
         id="products"
-        className="py-16 sm:py-24 px-4 sm:px-6 lg:px-8 bg-[#EDF4ED]"
+        className="py-16 sm:py-24 px-4 sm:px-6 lg:px-8 bg-[#f5f5f5]"
       >
         <div className="max-w-7xl mx-auto">
           <motion.div
@@ -367,17 +362,27 @@ function HomeContent() {
             style={{ willChange: "transform, opacity" }}
             className="text-center mb-12 sm:mb-16"
           >
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#301014] mb-3 sm:mb-4">
-              Nuestros Productos
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#000000] mb-3 sm:mb-4">
+              {searchQ ? `"${searchQ}"` : "Colección"}
             </h2>
-            <p className="text-lg sm:text-xl text-[#51291E] max-w-2xl mx-auto px-4">
-              Descubrí nuestra selección de productos artesanales
-            </p>
+            {(searchQ || searchArtist) && (
+              <a
+                href="/"
+                className="inline-block text-xs tracking-widest uppercase text-[#666666] hover:text-[#000000] transition-colors mb-3 border-b border-[#666666]/40"
+              >
+                × Limpiar filtro
+              </a>
+            )}
+            {!searchQ && !searchArtist && (
+              <p className="text-lg sm:text-xl text-[#666666] max-w-2xl mx-auto px-4">
+                Drops limitados y prendas con identidad propia
+              </p>
+            )}
           </motion.div>
 
           {loading ? (
             <div className="flex justify-center items-center py-20">
-              <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-[#F0D7A7]"></div>
+              <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-[#ffffff]"></div>
             </div>
           ) : products.length === 0 ? (
             <motion.div
@@ -385,29 +390,86 @@ function HomeContent() {
               animate={{ opacity: 1 }}
               className="text-center py-20"
             >
-              <p className="text-xl text-[#51291E]">
+              <p className="text-xl text-[#666666]">
                 No hay productos disponibles en este momento.
               </p>
-              <p className="text-[#51291E]/70 mt-2">
-                Vuelve pronto para ver nuestras novedades.
+              <p className="text-[#666666]/70 mt-2">
+                El próximo drop viene pronto. Quedate atento.
               </p>
             </motion.div>
           ) : (
             <>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                {products.map((product, index) => (
-                  <ProductCard
-                    key={product.id}
-                    {...product}
-                    index={index}
-                    adminMode={adminAuthed}
-                    onDeleted={fetchProducts}
-                    onEdit={() => setEditingProduct(product)}
-                  />
-                ))}
-                {adminAuthed && (
-                  <AddProductCard onClick={() => setShowAddForm(true)} />
-                )}
+              <div className="relative">
+                {/* Left arrow */}
+                <button
+                  onClick={() => scrollCarousel("left")}
+                  disabled={!carouselCanLeft}
+                  aria-label="Anterior"
+                  className="hidden lg:flex absolute left-0 top-1/2 -translate-y-1/2 -translate-x-5 z-10 w-10 h-10 rounded-full bg-white border border-gray-200 shadow-sm items-center justify-center hover:bg-gray-50 disabled:opacity-0 disabled:pointer-events-none transition-opacity cursor-pointer"
+                >
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={1.5}
+                      d="M15 19l-7-7 7-7"
+                    />
+                  </svg>
+                </button>
+
+                {/* Carousel track */}
+                <div
+                  ref={carouselRef}
+                  onScroll={updateCarouselArrows}
+                  className="flex overflow-x-auto hide-scrollbar"
+                >
+                  {products.map((product, index) => (
+                    <div
+                      key={product.id}
+                      className="w-full sm:w-1/2 lg:w-1/4 flex-shrink-0 px-3"
+                    >
+                      <ProductCard
+                        {...product}
+                        index={index}
+                        adminMode={adminAuthed}
+                        onDeleted={fetchProducts}
+                        onEdit={() => setEditingProduct(product)}
+                      />
+                    </div>
+                  ))}
+                  {adminAuthed && (
+                    <div className="w-full sm:w-1/2 lg:w-1/4 flex-shrink-0 px-3">
+                      <AddProductCard onClick={() => setShowAddForm(true)} />
+                    </div>
+                  )}
+                </div>
+
+                {/* Right arrow */}
+                <button
+                  onClick={() => scrollCarousel("right")}
+                  disabled={!carouselCanRight}
+                  aria-label="Siguiente"
+                  className="hidden lg:flex absolute right-0 top-1/2 -translate-y-1/2 translate-x-5 z-10 w-10 h-10 rounded-full bg-white border border-gray-200 shadow-sm items-center justify-center hover:bg-gray-50 disabled:opacity-0 disabled:pointer-events-none transition-opacity cursor-pointer"
+                >
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={1.5}
+                      d="M9 5l7 7-7 7"
+                    />
+                  </svg>
+                </button>
               </div>
               {/* Add product modal */}
               {showAddForm && (

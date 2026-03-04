@@ -11,20 +11,20 @@ export default function QuienesSomos() {
       <Navbar />
 
       {/* Hero */}
-      <section className="bg-[#301014] sm:min-h-screen relative overflow-hidden pt-24 sm:pt-32">
-        {/* Sofia's photo — stacked on mobile, absolute on desktop */}
+      <section className="bg-[#000000] sm:min-h-screen relative overflow-hidden pt-24 sm:pt-32">
+        {/* Brand photo — stacked on mobile, absolute on desktop */}
         <div className="relative w-full h-[28rem] sm:absolute sm:right-0 sm:top-0 sm:bottom-0 sm:w-2/5 sm:h-auto">
           <Image
-            src="/sofia.jpeg"
+            src="/about.jpg"
             fill
-            alt="Sofía"
+            alt="Distortion"
             className="object-cover object-top"
             priority
           />
           {/* Fade into background from left — desktop only */}
-          <div className="hidden sm:block absolute inset-0 bg-gradient-to-r from-[#301014] via-[#301014]/40 to-transparent" />
+          <div className="hidden sm:block absolute inset-0 bg-gradient-to-r from-[#000000] via-[#000000]/40 to-transparent" />
           {/* Fade from bottom */}
-          <div className="absolute inset-0 bg-gradient-to-t from-[#301014] via-[#301014]/40 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#000000] via-[#000000]/40 to-transparent" />
         </div>
 
         {/* Text content */}
@@ -34,7 +34,7 @@ export default function QuienesSomos() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
-              className="text-[#F0D7A7] text-xs tracking-[0.35em] uppercase mb-8"
+              className="text-[#ffffff] text-xs tracking-[0.35em] uppercase mb-8"
             >
               Quiénes Somos
             </motion.p>
@@ -42,24 +42,24 @@ export default function QuienesSomos() {
               initial={{ opacity: 0, y: 40 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.1 }}
-              className="text-[#EDF4ED] text-7xl sm:text-9xl lg:text-[11rem] font-bold leading-none tracking-tight mb-10"
+              className="text-[#ffffff] text-7xl sm:text-9xl lg:text-[11rem] font-bold leading-none tracking-tight mb-10"
             >
-              Soy<br />Sofía.
+              Somos<br />Distortion.
             </motion.h1>
             <motion.div
               initial={{ scaleX: 0 }}
               animate={{ scaleX: 1 }}
               transition={{ duration: 0.9, delay: 0.3, ease: "easeOut" }}
               style={{ originX: 0 }}
-              className="h-px bg-[#F0D7A7]/25 mb-10"
+              className="h-px bg-[#ffffff]/25 mb-10"
             />
             <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.6, delay: 0.5 }}
-              className="text-[#F0D7A7]/55 text-lg sm:text-xl max-w-md leading-relaxed"
+              className="text-[#ffffff]/55 text-lg sm:text-xl max-w-md leading-relaxed"
             >
-              Pastelera apasionada. Creadora de momentos memorables.
+              Marca independiente. Streetwear con identidad.
             </motion.p>
           </div>
         </div>
@@ -75,8 +75,8 @@ export default function QuienesSomos() {
             transition={{ duration: 0.6 }}
             style={{ willChange: "transform, opacity" }}
           >
-            <p className="text-[#301014] text-2xl sm:text-3xl font-semibold leading-snug">
-              "Estudio pastelería y soy apasionada con la cocina desde muy temprana edad."
+            <p className="text-[#000000] text-2xl sm:text-3xl font-semibold leading-snug">
+              &ldquo;Distortion nació del hartazgo de la ropa genérica. Queríamos algo con carácter, que se sintiera nuestro.&rdquo;
             </p>
           </motion.div>
 
@@ -88,14 +88,14 @@ export default function QuienesSomos() {
             style={{ willChange: "transform, opacity" }}
             className="lg:pt-4 space-y-5"
           >
-            <p className="text-[#51291E]/65 text-base sm:text-lg leading-relaxed">
-              Desde que tengo memoria, el olor a vainilla y manteca caliente llenaba mi hogar. Fue en la cocina de mi abuela donde descubrí que hornear no es solo una técnica — es una forma de expresar amor.
+            <p className="text-[#666666]/65 text-base sm:text-lg leading-relaxed">
+              Empezamos con una idea simple: hacer remeras que quisiéramos usar nosotros mismos. Sin intermediarios, sin moldes de otras marcas. Solo diseño propio y calidad que se nota en cada prenda.
             </p>
-            <p className="text-[#51291E]/65 text-base sm:text-lg leading-relaxed">
-              Hoy, con años de formación y una pasión que crece con cada receta, transformo ingredientes simples en momentos memorables para vos y tu familia.
+            <p className="text-[#666666]/65 text-base sm:text-lg leading-relaxed">
+              Hoy Distortion es una marca chica con ambición grande. Cada drop es limitado porque valoramos lo exclusivo por encima de lo masivo.
             </p>
-            <p className="text-[#51291E]/65 text-base sm:text-lg leading-relaxed">
-              Cada pedido es personal. Cada producto lleva tiempo, dedicación y el mismo amor que ponía mi abuela en su cocina.
+            <p className="text-[#666666]/65 text-base sm:text-lg leading-relaxed">
+              Cada prenda pasa por nuestras manos. Cada diseño tiene una historia detrás. Eso no cambia.
             </p>
           </motion.div>
         </div>
@@ -107,18 +107,18 @@ export default function QuienesSomos() {
           {[
             {
               num: "01",
-              title: "Pasión",
-              text: "Cada torta, alfajor y brownie es una expresión genuina de amor por la repostería artesanal.",
+              title: "Identidad",
+              text: "Cada diseño es original. No seguimos tendencias, las ignoramos y hacemos lo nuestro.",
             },
             {
               num: "02",
-              title: "Formación",
-              text: "Comprometida con aprender las mejores técnicas para ofrecerte siempre lo más rico.",
+              title: "Calidad",
+              text: "Telas premium, costuras prolijas y estampados que no se van con el primer lavado.",
             },
             {
               num: "03",
-              title: "Calidad",
-              text: "Solo ingredientes frescos y de primera calidad, porque el sabor se nota en cada detalle.",
+              title: "Comunidad",
+              text: "Distortion no es solo ropa, es la gente que la usa. Construimos algo juntos.",
             },
           ].map((item, i) => (
             <motion.div
@@ -130,11 +130,11 @@ export default function QuienesSomos() {
               style={{ willChange: "transform, opacity" }}
               className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-12 py-8 border-b border-gray-100 group cursor-default"
             >
-              <span className="text-[#F0D7A7] text-xs font-mono tracking-[0.25em]">{item.num}</span>
-              <h3 className="text-[#301014] text-2xl sm:text-3xl font-bold sm:w-36 shrink-0 group-hover:text-[#51291E] transition-colors duration-300">
+              <span className="text-[#ffffff] text-xs font-mono tracking-[0.25em]">{item.num}</span>
+              <h3 className="text-[#000000] text-2xl sm:text-3xl font-bold sm:w-36 shrink-0 group-hover:text-[#666666] transition-colors duration-300">
                 {item.title}
               </h3>
-              <p className="text-[#51291E]/55 text-base leading-relaxed max-w-lg">
+              <p className="text-[#666666]/55 text-base leading-relaxed max-w-lg">
                 {item.text}
               </p>
             </motion.div>
