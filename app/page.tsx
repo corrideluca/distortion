@@ -21,7 +21,7 @@ function extractDriveId(url: string): string {
 }
 
 function toDriveDirectUrl(url: string): string {
-  return `https://drive.google.com/uc?export=view&id=${extractDriveId(url)}`;
+  return `https://lh3.googleusercontent.com/d/${extractDriveId(url)}`;
 }
 
 function toDriveVideoUrl(url: string): string {
@@ -159,13 +159,10 @@ function HomeContent() {
 
       {/* Hero Banner Section */}
       <section
-        className={`relative overflow-hidden h-[calc(100vh-64px)] sm:h-[90vh] min-h-[500px] sm:min-h-[600px] ${
-          heroIsVideo ? "" : "bg-fixed bg-cover bg-center"
-        }`}
-        style={heroIsVideo ? undefined : { backgroundImage: `url('${heroImage}')` }}
+        className="relative overflow-hidden h-[calc(100vh-64px)] sm:h-[90vh] min-h-[500px] sm:min-h-[600px]"
       >
-        {/* Video background */}
-        {heroIsVideo && (
+        {/* Background media */}
+        {heroIsVideo ? (
           <video
             autoPlay
             loop
@@ -173,6 +170,13 @@ function HomeContent() {
             playsInline
             className="absolute inset-0 w-full h-full object-cover"
             src={heroImage}
+          />
+        ) : (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={heroImage}
+            alt=""
+            className="absolute inset-0 w-full h-full object-cover"
           />
         )}
         {/* Dark overlay */}
