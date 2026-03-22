@@ -136,7 +136,7 @@ export default function Navbar({
 
       {/* ── Mobile menu — fullscreen overlay (outside nav to avoid z-index issues) ── */}
       {mobileMenuOpen && (
-        <div className="md:hidden fixed inset-0 z-[100] bg-black flex flex-col">
+        <div className="md:hidden fixed inset-0 z-[100] bg-black/80 flex flex-col">
           {/* Top bar: logo + cart + close */}
           <div className="flex items-center justify-between px-4 -mt-7">
             <Link
