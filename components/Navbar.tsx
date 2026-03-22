@@ -54,6 +54,8 @@ export default function Navbar({
         animate={{ y: 0 }}
         transition={{ duration: 0.6 }}
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+          mobileMenuOpen ? "pointer-events-none" : ""
+        } ${
           scrolled
             ? "bg-white/95 backdrop-blur-md shadow-sm"
             : transparent
@@ -66,7 +68,7 @@ export default function Navbar({
             {/* Left: Logo */}
             <Link
               href="/"
-              className="flex-shrink-0 hover:opacity-75 transition-opacity"
+              className="flex-shrink-0 hover:opacity-75 transition-opacity z-100 relative"
             >
               <Image
                 src="/logo.png"
@@ -101,7 +103,7 @@ export default function Navbar({
             <div className="flex items-center gap-4">
               <button
                 onClick={() => setCartOpen(true)}
-                className={`text-sm font-medium tracking-wide uppercase transition-colors cursor-pointer ${isLight ? "text-white hover:text-white/70" : "text-black hover:text-black/60"}`}
+                className={`text-sm font-medium tracking-wide uppercase transition-colors cursor-pointer ${mobileMenuOpen ? "md:block hidden" : ""} ${isLight ? "text-white hover:text-white/70" : "text-black hover:text-black/60"}`}
                 aria-label="Abrir carrito"
               >
                 CART ({totalItems})
@@ -110,7 +112,7 @@ export default function Navbar({
               {/* Mobile hamburger */}
               <button
                 onClick={() => setMobileMenuOpen(true)}
-                className={`md:hidden p-1 transition-colors ${isLight ? "text-white" : "text-[#000000]"}`}
+                className={`md:hidden p-1 transition-colors ${mobileMenuOpen ? "hidden" : ""} ${isLight ? "text-white" : "text-[#000000]"}`}
                 aria-label="Abrir menú"
               >
                 <svg
@@ -134,9 +136,9 @@ export default function Navbar({
 
       {/* ── Mobile menu — fullscreen overlay (outside nav to avoid z-index issues) ── */}
       {mobileMenuOpen && (
-        <div className="md:hidden fixed inset-0 z-[100] bg-black/90 flex flex-col">
+        <div className="md:hidden fixed inset-0 z-[100] bg-black flex flex-col">
           {/* Top bar: logo + cart + close */}
-          <div className="flex items-center justify-between px-4 py-5">
+          <div className="flex items-center justify-between px-4 -mt-7">
             <Link
               href="/"
               onClick={() => setMobileMenuOpen(false)}
@@ -151,7 +153,7 @@ export default function Navbar({
                 style={{ filter: "brightness(0) invert(1)" }}
               />
             </Link>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4 mb-2">
               <button
                 onClick={() => {
                   setMobileMenuOpen(false);
@@ -184,7 +186,7 @@ export default function Navbar({
           </div>
 
           {/* Links */}
-          <div className="flex-1 flex flex-col px-6 -mt-8">
+          <div className="flex-1 flex flex-col px-6 mt-12">
             <nav className="space-y-5">
               {artists.map((artist) => (
                 <Link
