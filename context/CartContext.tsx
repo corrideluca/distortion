@@ -6,14 +6,20 @@ export interface CartItem {
   name: string;
   price: number;
   image: string;
+  size?: string;
   qty: number;
+}
+
+// Unique key for a cart item (product + size combo)
+function cartKey(item: { id: string; size?: string }) {
+  return item.size ? `${item.id}__${item.size}` : item.id;
 }
 
 type CartAction =
   | { type: "ADD_ITEM"; payload: Omit<CartItem, "qty"> }
-  | { type: "REMOVE_ITEM"; payload: { id: string } }
-  | { type: "INCREMENT"; payload: { id: string } }
-  | { type: "DECREMENT"; payload: { id: string } }
+  | { type: "REMOVE_ITEM"; payload: { id: string; size?: string } }
+  | { type: "INCREMENT"; payload: { id: string; size?: string } }
+  | { type: "DECREMENT"; payload: { id: string; size?: string } }
   | { type: "CLEAR" }
   | { type: "HYDRATE"; payload: CartItem[] };
 
@@ -22,33 +28,40 @@ function cartReducer(state: { items: CartItem[] }, action: CartAction) {
     case "HYDRATE":
       return { items: action.payload };
     case "ADD_ITEM": {
-      const existing = state.items.find((i) => i.id === action.payload.id);
+      const key = cartKey(action.payload);
+      const existing = state.items.find((i) => cartKey(i) === key);
       if (existing)
         return {
           items: state.items.map((i) =>
-            i.id === action.payload.id ? { ...i, qty: i.qty + 1 } : i
+            cartKey(i) === key ? { ...i, qty: i.qty + 1 } : i
           ),
         };
       return { items: [...state.items, { ...action.payload, qty: 1 }] };
     }
-    case "REMOVE_ITEM":
-      return { items: state.items.filter((i) => i.id !== action.payload.id) };
-    case "INCREMENT":
+    case "REMOVE_ITEM": {
+      const key = cartKey(action.payload);
+      return { items: state.items.filter((i) => cartKey(i) !== key) };
+    }
+    case "INCREMENT": {
+      const key = cartKey(action.payload);
       return {
         items: state.items.map((i) =>
-          i.id === action.payload.id ? { ...i, qty: i.qty + 1 } : i
+          cartKey(i) === key ? { ...i, qty: i.qty + 1 } : i
         ),
       };
-    case "DECREMENT":
+    }
+    case "DECREMENT": {
+      const key = cartKey(action.payload);
       return {
         items: state.items
           .map((i) =>
-            i.id === action.payload.id
+            cartKey(i) === key
               ? { ...i, qty: Math.max(0, i.qty - 1) }
               : i
           )
           .filter((i) => i.qty > 0),
       };
+    }
     case "CLEAR":
       return { items: [] };
     default:

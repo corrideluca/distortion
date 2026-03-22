@@ -17,6 +17,8 @@ import {
   createArtist,
   updateArtist,
   deleteArtist,
+  getCheckoutProduct,
+  updateCheckoutImages,
 } from "@/app/actions";
 import Image from "next/image";
 
@@ -32,6 +34,7 @@ interface Product {
   description: string;
   price: number;
   image: string;
+  sizes?: string[];
   artistId?: string | null;
   artist?: { id: string; name: string } | null;
 }
@@ -79,6 +82,7 @@ export default function AdminOverlay({
   const [showArtistForm, setShowArtistForm] = useState(false);
   const [editingArtist, setEditingArtist] = useState<Artist | null>(null);
   const [showAdminForm, setShowAdminForm] = useState(false);
+  const [imagesProduct, setImagesProduct] = useState<Product | null>(null);
 
   const handleToggle = () => {
     if (!drawerOpen && !authenticated && !checking) {
@@ -275,6 +279,15 @@ export default function AdminOverlay({
                         </div>
                         <div className="flex gap-1 flex-shrink-0">
                           <button
+                            onClick={() => setImagesProduct(p)}
+                            className="p-2 text-[#666666] hover:text-[#000000] hover:bg-gray-200 rounded-lg cursor-pointer transition-colors"
+                            title="Imágenes checkout"
+                          >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                          </button>
+                          <button
                             onClick={() => { setEditingProduct(p); setShowProductForm(true); }}
                             className="p-2 text-[#666666] hover:text-[#000000] hover:bg-gray-200 rounded-lg cursor-pointer transition-colors"
                           >
@@ -294,6 +307,12 @@ export default function AdminOverlay({
                       </div>
                     ))}
                   </div>
+                  {imagesProduct && (
+                    <CheckoutImagesModal
+                      product={imagesProduct}
+                      onClose={() => setImagesProduct(null)}
+                    />
+                  )}
                 </div>
               )}
 
@@ -614,11 +633,19 @@ export function AddProductModal({
   onCreated: () => void;
   product?: Product | null;
 }) {
+  const ALL_SIZES = ["XS", "S", "M", "L", "XL"];
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [isDrive, setIsDrive] = useState(false);
   const [artists, setArtists] = useState<Artist[]>([]);
+  const [sizes, setSizes] = useState<string[]>(product?.sizes ?? ALL_SIZES);
   const isEdit = !!product;
+
+  const toggleSize = (size: string) => {
+    setSizes((prev) =>
+      prev.includes(size) ? prev.filter((s) => s !== size) : [...prev, size]
+    );
+  };
 
   useEffect(() => {
     fetch("/api/artists")
@@ -645,6 +672,7 @@ export function AddProductModal({
               const raw = formData.get("image") as string;
               formData.set("image", toDriveDirectUrl(raw));
             }
+            formData.set("sizes", JSON.stringify(sizes));
             const result = isEdit ? await updateProduct(product.id, formData) : await createProduct(formData);
             setLoading(false);
             if (result.error) setError(result.error);
@@ -674,11 +702,178 @@ export function AddProductModal({
             <option value="">Sin artista</option>
             {artists.map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}
           </select>
+          <label className="block text-sm font-medium text-[#666666] mb-2">Talles disponibles</label>
+          <div className="flex gap-2 mb-4">
+            {ALL_SIZES.map((size) => (
+              <button
+                key={size}
+                type="button"
+                onClick={() => toggleSize(size)}
+                className={`px-3 py-1.5 rounded-lg text-sm font-medium border transition-colors cursor-pointer ${
+                  sizes.includes(size)
+                    ? "bg-black text-white border-black"
+                    : "bg-white text-[#999] border-gray-200 line-through"
+                }`}
+              >
+                {size}
+              </button>
+            ))}
+          </div>
           <button type="submit" disabled={loading}
             className="w-full py-3 bg-[#000000] text-[#ffffff] font-bold rounded-xl hover:bg-[#333333] transition-colors disabled:opacity-50 cursor-pointer">
             {loading ? (isEdit ? "Guardando..." : "Creando...") : (isEdit ? "Guardar Cambios" : "Crear Producto")}
           </button>
         </form>
+      </div>
+    </div>
+  );
+}
+
+function CheckoutImagesModal({
+  product,
+  onClose,
+}: {
+  product: Product;
+  onClose: () => void;
+}) {
+  const [images, setImages] = useState<string[]>([]);
+  const [newUrl, setNewUrl] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [isDrive, setIsDrive] = useState(false);
+
+  useEffect(() => {
+    getCheckoutProduct(product.id).then((cp) => {
+      if (cp) setImages(cp.images);
+      else setImages([product.image]);
+      setLoading(false);
+    });
+  }, [product.id, product.image]);
+
+  const handleAdd = () => {
+    let url = newUrl.trim();
+    if (!url) return;
+    if (isDrive) {
+      const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+      const fileId = match ? match[1] : url.trim();
+      url = `https://drive.google.com/uc?export=view&id=${fileId}`;
+    }
+    setImages((prev) => [...prev, url]);
+    setNewUrl("");
+    setIsDrive(false);
+  };
+
+  const handleRemove = (index: number) => {
+    setImages((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
+    await updateCheckoutImages(product.id, images);
+    setSaving(false);
+    onClose();
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[80] flex items-center justify-center p-4">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-6 max-h-[80vh] flex flex-col">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-bold text-black">
+            Imágenes — {product.name}
+          </h2>
+          <button
+            onClick={onClose}
+            className="text-[#666] hover:text-black text-2xl leading-none cursor-pointer"
+          >
+            &times;
+          </button>
+        </div>
+
+        {loading ? (
+          <div className="flex justify-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-black/20" />
+          </div>
+        ) : (
+          <>
+            <div className="flex-1 overflow-y-auto space-y-2 mb-4">
+              {images.map((img, i) => (
+                <div
+                  key={i}
+                  className="flex items-center gap-3 p-2 bg-gray-50 rounded-xl"
+                >
+                  <Image
+                    src={img}
+                    alt={`Image ${i + 1}`}
+                    width={60}
+                    height={60}
+                    className="w-14 h-14 rounded-lg object-cover flex-shrink-0"
+                  />
+                  <p className="text-xs text-[#666] truncate flex-1 min-w-0">
+                    {img}
+                  </p>
+                  <button
+                    onClick={() => handleRemove(i)}
+                    className="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg cursor-pointer transition-colors flex-shrink-0"
+                  >
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M6 18L18 6M6 6l12 12"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              ))}
+              {images.length === 0 && (
+                <p className="text-sm text-[#999] text-center py-4">
+                  Sin imágenes. Agregá al menos una.
+                </p>
+              )}
+            </div>
+
+            {/* Add new image */}
+            <div className="flex gap-2 mb-1">
+              <input
+                type="url"
+                value={newUrl}
+                onChange={(e) => setNewUrl(e.target.value)}
+                placeholder={isDrive ? "https://drive.google.com/file/d/..." : "https://..."}
+                className="flex-1 px-3 py-2 border border-gray-200 rounded-xl text-sm text-black focus:outline-none focus:ring-2 focus:ring-gray-400"
+                onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), handleAdd())}
+              />
+              <button
+                onClick={handleAdd}
+                className="px-4 py-2 bg-black text-white rounded-xl text-sm font-medium cursor-pointer hover:bg-[#333] transition-colors"
+              >
+                +
+              </button>
+            </div>
+            <label className="flex items-center gap-2 mb-4 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={isDrive}
+                onChange={(e) => setIsDrive(e.target.checked)}
+                className="rounded"
+              />
+              <span className="text-xs text-[#666]">Es Drive</span>
+            </label>
+
+            <button
+              onClick={handleSave}
+              disabled={saving}
+              className="w-full py-3 bg-black text-white font-bold rounded-xl hover:bg-[#333] transition-colors disabled:opacity-50 cursor-pointer"
+            >
+              {saving ? "Guardando..." : "Guardar Imágenes"}
+            </button>
+          </>
+        )}
       </div>
     </div>
   );

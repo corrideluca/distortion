@@ -34,13 +34,20 @@ export async function createProduct(formData: FormData) {
   const price = parseFloat(formData.get("price") as string);
   const image = formData.get("image") as string;
   const artistId = (formData.get("artistId") as string) || null;
+  const sizesRaw = formData.get("sizes") as string;
+  const sizes = sizesRaw ? JSON.parse(sizesRaw) as string[] : ["XS", "S", "M", "L", "XL"];
 
   if (!name || !description || !price || !image) {
     return { error: "Todos los campos son obligatorios" };
   }
 
   const product = await prisma.product.create({
-    data: { name, description, price, image, artistId },
+    data: { name, description, price, image, artistId, sizes },
+  });
+
+  // Auto-create checkout product with the main image
+  await prisma.checkoutProduct.create({
+    data: { productId: product.id, images: [image] },
   });
 
   return { success: true, product };
@@ -55,6 +62,8 @@ export async function updateProduct(id: string, formData: FormData) {
   const price = parseFloat(formData.get("price") as string);
   const image = formData.get("image") as string;
   const artistId = (formData.get("artistId") as string) || null;
+  const sizesRaw = formData.get("sizes") as string;
+  const sizes = sizesRaw ? JSON.parse(sizesRaw) as string[] : ["XS", "S", "M", "L", "XL"];
 
   if (!name || !description || !price || !image) {
     return { error: "Todos los campos son obligatorios" };
@@ -62,7 +71,7 @@ export async function updateProduct(id: string, formData: FormData) {
 
   const product = await prisma.product.update({
     where: { id },
-    data: { name, description, price, image, artistId },
+    data: { name, description, price, image, artistId, sizes },
   });
 
   return { success: true, product };
@@ -173,6 +182,25 @@ export async function deleteAdmin(id: string) {
 
   await prisma.admin.delete({ where: { id } });
   return { success: true };
+}
+
+// ── Checkout Products ────────────────────────────────────────────────────────
+
+export async function getCheckoutProduct(productId: string) {
+  return prisma.checkoutProduct.findUnique({ where: { productId } });
+}
+
+export async function updateCheckoutImages(productId: string, images: string[]) {
+  const adminId = await getSession();
+  if (!adminId) return { error: "No autorizado" };
+
+  const checkout = await prisma.checkoutProduct.upsert({
+    where: { productId },
+    update: { images },
+    create: { productId, images },
+  });
+
+  return { success: true, checkout };
 }
 
 // ── Settings ─────────────────────────────────────────────────────────────────

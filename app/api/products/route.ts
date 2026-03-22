@@ -6,13 +6,18 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const q = searchParams.get('q') || '';
     const artistId = searchParams.get('artist') || '';
+    const category = searchParams.get('category') || '';
 
     const products = await prisma.product.findMany({
       where: {
         ...(q && { name: { contains: q, mode: 'insensitive' } }),
         ...(artistId && { artistId }),
+        ...(category && { category: { equals: category, mode: 'insensitive' } }),
       },
-      include: { artist: { select: { id: true, name: true } } },
+      include: {
+        artist: { select: { id: true, name: true } },
+        checkoutProduct: { select: { id: true } },
+      },
       orderBy: { createdAt: 'desc' },
     });
 

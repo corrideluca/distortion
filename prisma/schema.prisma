@@ -24,18 +24,31 @@ model Artist {
 }
 
 model Product {
-  id          String   @id @default(cuid())
-  name        String
-  description String   @db.Text
-  price       Float
-  image       String
-  category    String?
-  artistId    String?
-  artist      Artist?  @relation(fields: [artistId], references: [id], onDelete: SetNull)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id              String           @id @default(cuid())
+  name            String
+  description     String           @db.Text
+  price           Float
+  image           String
+  category        String?
+  sizes           String[]         @default(["XS", "S", "M", "L", "XL"])
+  artistId        String?
+  artist          Artist?          @relation(fields: [artistId], references: [id], onDelete: SetNull)
+  checkoutProduct CheckoutProduct?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
 
   @@map("products")
+}
+
+model CheckoutProduct {
+  id        String   @id @default(uuid())
+  productId String   @unique
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  images    String[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("checkout_products")
 }
 
 model Admin {

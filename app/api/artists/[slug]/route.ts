@@ -12,6 +12,9 @@ export async function GET(
       include: {
         products: {
           orderBy: { createdAt: "desc" },
+          include: {
+            checkoutProduct: { select: { id: true } },
+          },
         },
       },
     });
